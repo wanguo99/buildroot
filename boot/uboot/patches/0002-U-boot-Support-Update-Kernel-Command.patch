@@ -1,0 +1,31 @@
+diff --git a/include/configs/mx6ullevk.h b/include/configs/mx6ullevk.h
+index eb9867cb..a1692ac6 100644
+--- a/include/configs/mx6ullevk.h
++++ b/include/configs/mx6ullevk.h
+@@ -81,6 +81,9 @@
+ #define CFG_EXTRA_ENV_SETTINGS \
+ 	CFG_MFG_ENV_SETTINGS \
+ 	TEE_ENV \
++    "dl_zImage=tftp 0x82000000 zImage; setenv zImage_size ${filesize}; fatwrite mmc ${mmcdev}:${mmcpart} 0x82000000 /zImage ${zImage_size}; echo update zImage ok.\0" \
++    "dl_fdt=tftp 0x83000000 ${fdt_file}; setenv fdt_size ${filesize}; fatwrite mmc ${mmcdev}:${mmcpart} 0x83000000 /${fdt_file} ${fdt_size}; echo update fdt ok.\0" \
++    "dk=run findfdt; mmc dev ${mmcdev}; run dl_zImage; run dl_fdt\0" \
+ 	"ethaddr=3c:24:07:14:14:10\0" \
+ 	"eth1addr=3c:24:07:14:14:12\0" \
+ 	"ipaddr=10.10.0.221\0" \
+@@ -91,7 +94,7 @@
+ 	"console=ttymxc0\0" \
+ 	"fdt_high=0xffffffff\0" \
+ 	"initrd_high=0xffffffff\0" \
+-	"fdt_file=undefined\0" \
++	"fdt_file=imx6ull-14x14-evk.dtb\0" \
+ 	"fdt_addr=0x83000000\0" \
+ 	"tee_addr=0x84000000\0" \
+ 	"tee_file=undefined\0" \
+@@ -137,6 +140,7 @@
+ 		"root=/dev/nfs " \
+ 	"ip=dhcp nfsroot=${serverip}:${nfsroot},v3,tcp\0" \
+ 		"netboot=echo Booting from net ...; " \
++		"run findfdt; " \
+ 		"${usb_net_cmd}; " \
+ 		"run netargs; " \
+ 		"if test ${ip_dyn} = yes; then " \

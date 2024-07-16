@@ -1,6 +1,6 @@
 #
 # Automatically generated file; DO NOT EDIT.
-# Buildroot -g685a2c5227 Configuration
+# Buildroot -ge194de1100-dirty Configuration
 #
 BR2_HAVE_DOT_CONFIG=y
 BR2_HOST_GCC_AT_LEAST_4_9=y
@@ -567,6 +567,12 @@ BR2_LINUX_KERNEL_NEEDS_HOST_OPENSSL=y
 #
 # Target packages
 #
+
+#
+# Wanguo packages
+#
+BR2_PACKAGE_BSP=y
+BR2_PACKAGE_OSA=y
 BR2_PACKAGE_BUSYBOX=y
 BR2_PACKAGE_BUSYBOX_CONFIG="package/busybox/busybox.config"
 BR2_PACKAGE_BUSYBOX_CONFIG_FRAGMENT_FILES=""

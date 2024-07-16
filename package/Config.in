@@ -2,6 +2,7 @@ menu "Target packages"
 
 menu "Wanguo packages"
 	source "package/bsp/Config.in"
+	source "package/osa/Config.in"
 endmenu
 
 	source "package/busybox/Config.in"

@@ -1,27 +1,27 @@
 #include <linux/kernel.h>
 #include <linux/module.h>
 
-int bsp_init(void);
-void bsp_exit(void);
+int BSP_init(void);
+void BSP_exit(void);
 
-int bsp_init(void)
+int BSP_init(void)
 {
 	pr_info("Hello World!\n");
-	pr_info("bsp module init.\n");
+	pr_info("BSP module init.\n");
 
 	return 0;
 }
 
-void bsp_exit(void)
+void BSP_exit(void)
 {
-	pr_info("bsp module exit.\n");
+	pr_info("BSP module exit.\n");
 
 	return;
 }
 
-module_init(bsp_init);
-module_exit(bsp_exit);
+module_init(BSP_init);
+module_exit(BSP_exit);
 
 MODULE_LICENSE("GPL");
 MODULE_AUTHOR("Guo Hao");
-MODULE_DESCRIPTION("A Simple BSP Module");
+MODULE_DESCRIPTION("BSP Module");

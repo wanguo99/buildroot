@@ -1,12 +1,12 @@
 ################################################################################
 #
-# bsp: A simple kernel-module
+# osa: OSA Layer
 #
 ################################################################################
 
-BSP_VERSION = 1.0
-BSP_SITE = ./package/bsp/src
-BSP_SITE_METHOD = local
+OSA_VERSION = 1.0
+OSA_SITE = ./package/osa/src
+OSA_SITE_METHOD = local
 
 $(eval $(kernel-module))
 $(eval $(generic-package))

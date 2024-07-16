@@ -1,10 +1,5 @@
 menu "Target packages"
 
-menu "Wanguo packages"
-	source "package/bsp/Config.in"
-	source "package/osa/Config.in"
-endmenu
-
 	source "package/busybox/Config.in"
 	source "package/skeleton/Config.in"
 	source "package/skeleton-custom/Config.in"
@@ -13,6 +8,11 @@ endmenu
 	source "package/skeleton-init-openrc/Config.in"
 	source "package/skeleton-init-systemd/Config.in"
 	source "package/skeleton-init-sysv/Config.in"
+
+menu "Wanguo packages"
+	source "package/bsp/Config.in"
+	source "package/osa/Config.in"
+endmenu
 
 menu "Audio and video applications"
 	source "package/alsa-utils/Config.in"

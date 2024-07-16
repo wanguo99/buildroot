@@ -1,0 +1,6 @@
+config BR2_PACKAGE_BSP
+	bool "BSP"
+	depends on BR2_LINUX_KERNEL
+	help
+		A simple bsp module.
+

@@ -1,5 +1,9 @@
 menu "Target packages"
 
+menu "Wanguo packages"
+	source "package/bsp/Config.in"
+endmenu
+
 	source "package/busybox/Config.in"
 	source "package/skeleton/Config.in"
 	source "package/skeleton-custom/Config.in"

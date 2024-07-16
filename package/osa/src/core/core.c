@@ -1,20 +1,24 @@
 #include <linux/kernel.h>
 #include <linux/module.h>
 
-int OSA_init(void);
-void OSA_exit(void);
+#include "osa.h"
 
-int OSA_init(void)
+
+OSA_INT32 OSA_init(OSA_VOID);
+OSA_VOID OSA_exit(OSA_VOID);
+
+OSA_INT32 OSA_init(OSA_VOID)
 {
-	pr_info("Hello World!\n");
-	pr_info("OSA module init.\n");
+	OSA_INFO("OSA module init.\n");
 
-	return 0;
+	OSA_INFO("Hello World!\n");
+
+	return OSA_SOK;
 }
 
-void OSA_exit(void)
+OSA_VOID OSA_exit(OSA_VOID)
 {
-	pr_info("OSA module exit.\n");
+	OSA_FATAL("OSA module exit.\n");
 
 	return;
 }

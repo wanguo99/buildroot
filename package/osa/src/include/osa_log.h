@@ -11,32 +11,32 @@
 
 typedef struct {
     va_list ap;
-    const char *fmt;
-    const char *file;
+    OSA_CONST OSA_INT8 *fmt;
+    OSA_CONST OSA_INT8 *file;
     struct tm *time; // Not frequently used in kernel
-    void *udata;
-    int line;
-    int level;
+    OSA_VOID *udata;
+    OSA_INT32 line;
+    OSA_INT32 level;
 } log_Event;
 
-typedef void (*log_LogFn)(log_Event *ev);
-typedef void (*log_LockFn)(bool lock, void *udata);
+typedef OSA_VOID (*log_log_fn)(log_Event *ev);
+typedef OSA_VOID (*log_lock_fn)(OSA_BOOL lock, OSA_VOID *udata);
 
 enum { LOG_TRACE, LOG_DEBUG, LOG_INFO, LOG_WARN, LOG_ERROR, LOG_FATAL };
 
-#define log_trace(...) log_log(LOG_TRACE, __FILE__, __LINE__, __VA_ARGS__)
-#define log_debug(...) log_log(LOG_DEBUG, __FILE__, __LINE__, __VA_ARGS__)
-#define log_info(...)  log_log(LOG_INFO,  __FILE__, __LINE__, __VA_ARGS__)
-#define log_warn(...)  log_log(LOG_WARN,  __FILE__, __LINE__, __VA_ARGS__)
-#define log_error(...) log_log(LOG_ERROR, __FILE__, __LINE__, __VA_ARGS__)
-#define log_fatal(...) log_log(LOG_FATAL, __FILE__, __LINE__, __VA_ARGS__)
+#define OSA_TRACE(...) OSA_log(LOG_TRACE, __FILE__, __LINE__, __VA_ARGS__)
+#define OSA_DEBUG(...) OSA_log(LOG_DEBUG, __FILE__, __LINE__, __VA_ARGS__)
+#define OSA_INFO(...)  OSA_log(LOG_INFO,  __FILE__, __LINE__, __VA_ARGS__)
+#define OSA_WARN(...)  OSA_log(LOG_WARN,  __FILE__, __LINE__, __VA_ARGS__)
+#define OSA_ERROR(...) OSA_log(LOG_ERROR, __FILE__, __LINE__, __VA_ARGS__)
+#define OSA_FATAL(...) OSA_log(LOG_FATAL, __FILE__, __LINE__, __VA_ARGS__)
 
-const char* log_level_string(int level);
-void log_set_lock(log_LockFn fn, void *udata);
-void log_set_level(int level);
-void log_set_quiet(bool enable);
-int log_add_callback(log_LogFn fn, void *udata, int level);
+OSA_CONST OSA_INT8* log_level_string(OSA_INT32 level);
+OSA_VOID log_set_lock(log_lock_fn fn, OSA_VOID *udata);
+OSA_VOID log_set_level(OSA_INT32 level);
+OSA_VOID log_set_quiet(OSA_BOOL enable);
+OSA_INT32 log_add_callback(log_log_fn fn, OSA_VOID *udata, OSA_INT32 level);
 
-void log_log(int level, const char *file, int line, const char *fmt, ...);
+OSA_VOID OSA_log(OSA_INT32 level, OSA_CONST OSA_INT8 *file, OSA_INT32 line, OSA_CONST OSA_INT8 *fmt, ...);
 
 #endif // _OSA_LOG_KERN_H

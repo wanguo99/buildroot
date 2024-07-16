@@ -449,7 +449,7 @@ BR2_HOST_DIR="$(BASE_DIR)/host"
 #
 BR2_PRIMARY_SITE=""
 BR2_BACKUP_SITE="https://sources.buildroot.net"
-BR2_KERNEL_MIRROR="https://cdn.kernel.org/pub"
+BR2_KERNEL_MIRROR="https://kernel.org/pub"
 BR2_GNU_MIRROR="http://ftpmirror.gnu.org"
 BR2_LUAROCKS_MIRROR="http://rocks.moonscript.org"
 BR2_CPAN_MIRROR="https://cpan.metacpan.org"

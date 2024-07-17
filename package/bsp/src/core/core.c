@@ -1,20 +1,24 @@
 #include <linux/kernel.h>
 #include <linux/module.h>
 
-int BSP_init(void);
-void BSP_exit(void);
+#include "osa/osa.h"
 
-int BSP_init(void)
+//#include "bsp.h"
+
+INT32 BSP_init(VOID);
+void BSP_exit(VOID);
+
+INT32 BSP_init(VOID)
 {
-	pr_info("Hello World!\n");
-	pr_info("BSP module init.\n");
+	OSA_INFO("Hello World!\n");
+	OSA_INFO("BSP module init.\n");
 
 	return 0;
 }
 
-void BSP_exit(void)
+VOID BSP_exit(VOID)
 {
-	pr_info("BSP module exit.\n");
+	OSA_INFO("BSP module exit.\n");
 
 	return;
 }

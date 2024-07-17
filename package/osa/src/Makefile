@@ -3,13 +3,16 @@ TARGET := osa
 obj-m += $(TARGET).o
 
 ARCH ?= arm
-CROSS_COMPILE ?= arm-wanguo-linux-gnueabihf-
+CROSS_COMPILE ?= arm-linux-gnueabihf-
 
 PWD :=$(shell pwd)
 
 $(TARGET)-objs += core/core.o
 EXTRA_CFLAGS += -I$(PWD)/include \
-				-fmacro-prefix-map=$(PWD)/=
+				-I$(STAGING_DIR)/include \
+				-I$(STAGING_DIR)/usr/include
+
+EXTRA_CFLAGS += -fmacro-prefix-map=$(PWD)/=
 
 
 .PHONY: all clean

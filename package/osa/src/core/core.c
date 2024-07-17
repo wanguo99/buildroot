@@ -4,8 +4,9 @@
 #include "osa.h"
 
 
-INT32 OSA_init(VOID);
-VOID OSA_exit(VOID);
+STATIC INT32 OSA_init(VOID);
+STATIC VOID OSA_exit(VOID);
+
 
 STATIC VOID OSA_logTest(VOID)
 {

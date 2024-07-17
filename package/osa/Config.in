@@ -1,6 +1,5 @@
 config BR2_PACKAGE_OSA
 	bool "OSA"
-	depends on BR2_LINUX_KERNEL
 	help
-		Operation System Adaptor Layer Module.
+		Operation System Adaptor Module.
 

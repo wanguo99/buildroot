@@ -1,6 +1,6 @@
 config BR2_PACKAGE_PDL
 	bool "PDL"
-	depends on BR2_PACKAGE_OSA
+	depends on BR2_PACKAGE_OSA && BR2_PACKAGE_HAL && BR2_PACKAGE_CFG
 	help
 		Peripheral Driver Library Module.
 

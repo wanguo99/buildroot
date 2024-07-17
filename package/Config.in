@@ -3,7 +3,7 @@ menu "Target packages"
 menu "Wanguo packages"
 menu "drivers"
 	source "package/osa/Config.in"
-	source "package/pconfig/Config.in"
+	source "package/cfg/Config.in"
 	source "package/hal/Config.in"
 	source "package/pdl/Config.in"
 endmenu

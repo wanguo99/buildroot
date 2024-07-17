@@ -1,0 +1,12 @@
+config BR2_PACKAGE_CFG
+	bool "CFG"
+	depends on BR2_PACKAGE_OSA
+	help
+		Product Config Module.
+
+config BR2_PACKAGE_CFG_VERSION
+	string "cfg version"
+	default "0.0.1"
+	depends on BR2_PACKAGE_CFG
+	help
+		Specify the version of the cfg kernel module.

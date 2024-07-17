@@ -1,4 +1,4 @@
-TARGET := pconfig
+TARGET := cfg
 obj-m += $(TARGET).o
 
 ARCH ?= arm
@@ -6,10 +6,10 @@ CROSS_COMPILE ?= arm-linux-gnueabihf-
 
 PWD :=$(shell pwd)
 
-SRCS =	pconfig_core.c
+SRCS =	cfg_core.c
 
 ifeq ($(PLATFORM), imx6ull)
-	SRCS += platform/imx6ull/pconfig_imx6ull_alpha.c
+	SRCS += platform/imx6ull/cfg_imx6ull_alpha.c
 endif
 
 $(TARGET)-objs = $(SRCS:.c=.o)

@@ -27,7 +27,7 @@ define HAL_INSTALL_TARGET_CMDS
     $(INSTALL) -D -m 0755 $(@D)/Module.symvers $(STAGING_DIR)/usr/share/Module.symvers/hal/
 endef
 
-HAL_DEPENDENCIES = linux
+HAL_DEPENDENCIES = linux osa
 
 $(eval $(kernel-module))
 $(eval $(generic-package))

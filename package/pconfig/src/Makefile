@@ -6,7 +6,11 @@ CROSS_COMPILE ?= arm-linux-gnueabihf-
 
 PWD :=$(shell pwd)
 
-SRCS = pconfig_core.c 
+SRCS =	pconfig_core.c
+
+ifeq ($(PLATFORM), imx6ull)
+	SRCS += platform/imx6ull/pconfig_imx6ull_alpha.c
+endif
 
 $(TARGET)-objs = $(SRCS:.c=.o)
 

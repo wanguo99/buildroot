@@ -1,34 +1,14 @@
 #include <linux/kernel.h>
 #include <linux/module.h>
-
-#include "osa.h"
-
-
-STATIC INT32 OSA_init(VOID);
-STATIC VOID OSA_exit(VOID);
+#include "osa/osa.h"
 
 
-STATIC VOID OSA_logTest(VOID)
+STATIC INT32 PCONFIG_init(VOID);
+STATIC VOID PCONFIG_exit(VOID);
+
+INT32 PCONFIG_init(VOID)
 {
-    OSA_INFO("Start log module test.");
-
-    OSA_EMERG("");
-    OSA_ALERT("");
-    OSA_CRIT("");
-    OSA_ERROR("");
-    OSA_WARN("");
-    OSA_NOTICE("");
-    OSA_INFO("");
-    OSA_DEBUG("");
-    OSA_log("");
-
-    return;
-}
-
-
-INT32 OSA_init(VOID)
-{
-	OSA_INFO("OSA module init.");
+	OSA_INFO("PCONFIG module init.");
 
 	OSA_INFO("Hello World!");
 
@@ -38,16 +18,16 @@ INT32 OSA_init(VOID)
 	return OSA_SOK;
 }
 
-VOID OSA_exit(VOID)
+VOID PCONFIG_exit(VOID)
 {
-	OSA_INFO("OSA module exit.");
+	OSA_INFO("PCONFIG module exit.");
 
 	return;
 }
 
-module_init(OSA_init);
-module_exit(OSA_exit);
+module_init(PCONFIG_init);
+module_exit(PCONFIG_exit);
 
 MODULE_LICENSE("GPL");
 MODULE_AUTHOR("Guo Hao");
-MODULE_DESCRIPTION("OSA Module");
+MODULE_DESCRIPTION("Product Config Module");

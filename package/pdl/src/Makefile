@@ -20,7 +20,7 @@ EXTRA_CFLAGS += -fmacro-prefix-map=$(PWD)/=
 # 额外的符号表（其他模块导出符号）
 KBUILD_EXTRA_SYMBOLS_PATH = $(STAGING_DIR)/usr/share/Module.symvers
 KBUILD_EXTRA_SYMBOLS += $(KBUILD_EXTRA_SYMBOLS_PATH)/osa/Module.symvers \
-						$(KBUILD_EXTRA_SYMBOLS_PATH)/pconfig/Module.symvers \
+						$(KBUILD_EXTRA_SYMBOLS_PATH)/cfg/Module.symvers \
 						$(KBUILD_EXTRA_SYMBOLS_PATH)/hal/Module.symvers
 
 .PHONY: all clean

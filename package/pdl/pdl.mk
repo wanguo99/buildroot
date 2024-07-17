@@ -27,7 +27,7 @@ define PDL_INSTALL_TARGET_CMDS
     $(INSTALL) -D -m 0755 $(@D)/Module.symvers $(STAGING_DIR)/usr/share/Module.symvers/pdl/
 endef
 
-PDL_DEPENDENCIES = linux osa pconfig
+PDL_DEPENDENCIES = linux osa cfg
 
 $(eval $(kernel-module))
 $(eval $(generic-package))

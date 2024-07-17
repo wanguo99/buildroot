@@ -4,39 +4,96 @@
 #include <linux/kernel.h>
 #include <linux/module.h>
 #include <linux/spinlock.h>
-#include <linux/ktime.h>
 
-#define LOG_VERSION "0.1.0"
-#define MAX_CALLBACKS 32
+#define LOG_WITH_COLOR 1
 
-typedef struct {
-    va_list ap;
-    OSA_CONST OSA_INT8 *fmt;
-    OSA_CONST OSA_INT8 *file;
-    struct tm *time; // Not frequently used in kernel
-    OSA_VOID *udata;
-    OSA_INT32 line;
-    OSA_INT32 level;
-} log_Event;
+/* ANSI颜色转义码定义，仅在LOG_WITH_COLOR启用时使用 */
+#ifdef LOG_WITH_COLOR
+#define ANSI_COLOR_RED     "\x1b[31m"
+#define ANSI_COLOR_GREEN   "\x1b[32m"
+#define ANSI_COLOR_YELLOW  "\x1b[33m"
+#define ANSI_COLOR_BLUE    "\x1b[34m"
+#define ANSI_COLOR_MAGENTA "\x1b[35m"
+#define ANSI_COLOR_CYAN    "\x1b[36m"
+#define ANSI_COLOR_RESET   "\x1b[0m"
+#endif // LOG_WITH_COLOR
 
-typedef OSA_VOID (*log_log_fn)(log_Event *ev);
-typedef OSA_VOID (*log_lock_fn)(OSA_BOOL lock, OSA_VOID *udata);
 
-enum { LOG_TRACE, LOG_DEBUG, LOG_INFO, LOG_WARN, LOG_ERROR, LOG_FATAL };
-
-#define OSA_TRACE(...) OSA_log(LOG_TRACE, __FILE__, __LINE__, __VA_ARGS__)
-#define OSA_DEBUG(...) OSA_log(LOG_DEBUG, __FILE__, __LINE__, __VA_ARGS__)
-#define OSA_INFO(...)  OSA_log(LOG_INFO,  __FILE__, __LINE__, __VA_ARGS__)
-#define OSA_WARN(...)  OSA_log(LOG_WARN,  __FILE__, __LINE__, __VA_ARGS__)
-#define OSA_ERROR(...) OSA_log(LOG_ERROR, __FILE__, __LINE__, __VA_ARGS__)
-#define OSA_FATAL(...) OSA_log(LOG_FATAL, __FILE__, __LINE__, __VA_ARGS__)
-
-OSA_CONST OSA_INT8* log_level_string(OSA_INT32 level);
-OSA_VOID log_set_lock(log_lock_fn fn, OSA_VOID *udata);
-OSA_VOID log_set_level(OSA_INT32 level);
-OSA_VOID log_set_quiet(OSA_BOOL enable);
-OSA_INT32 log_add_callback(log_log_fn fn, OSA_VOID *udata, OSA_INT32 level);
-
-OSA_VOID OSA_log(OSA_INT32 level, OSA_CONST OSA_INT8 *file, OSA_INT32 line, OSA_CONST OSA_INT8 *fmt, ...);
+// 校色版和无颜色版的宏定义，以便于控制是否启用颜色
+#ifdef LOG_WITH_COLOR
+#define OSA_EMERG(fmt, ...)  \
+    do { \
+        printk(KERN_EMERG   ANSI_COLOR_RED     "[EMERG] %s:%d " fmt ANSI_COLOR_RESET "\n", __FILE__, __LINE__, ##__VA_ARGS__); \
+    } while (0)
+#define OSA_ALERT(fmt, ...)  \
+    do { \
+        printk(KERN_ALERT   ANSI_COLOR_RED     "[ALERT] %s:%d " fmt ANSI_COLOR_RESET "\n", __FILE__, __LINE__, ##__VA_ARGS__); \
+    } while (0)
+#define OSA_CRIT(fmt, ...)   \
+    do { \
+        printk(KERN_CRIT    ANSI_COLOR_MAGENTA "[CRIT] %s:%d " fmt ANSI_COLOR_RESET "\n", __FILE__, __LINE__, ##__VA_ARGS__); \
+    } while (0)
+#define OSA_ERROR(fmt, ...)  \
+    do { \
+        printk(KERN_ERR     ANSI_COLOR_RED     "[ERROR] %s:%d " fmt ANSI_COLOR_RESET "\n", __FILE__, __LINE__, ##__VA_ARGS__); \
+    } while (0)
+#define OSA_WARN(fmt, ...)   \
+    do { \
+        printk(KERN_WARNING ANSI_COLOR_YELLOW  "[WARN] %s:%d " fmt ANSI_COLOR_RESET "\n", __FILE__, __LINE__, ##__VA_ARGS__); \
+    } while (0)
+#define OSA_NOTICE(fmt, ...) \
+    do { \
+        printk(KERN_NOTICE  ANSI_COLOR_GREEN   "[NOTICE] %s:%d " fmt ANSI_COLOR_RESET "\n", __FILE__, __LINE__, ##__VA_ARGS__); \
+    } while (0)
+#define OSA_INFO(fmt, ...)   \
+    do { \
+        printk(KERN_INFO    ANSI_COLOR_BLUE    "[INFO] %s:%d " fmt ANSI_COLOR_RESET "\n", __FILE__, __LINE__, ##__VA_ARGS__); \
+    } while (0)
+#define OSA_DEBUG(fmt, ...)  \
+    do { \
+        printk(KERN_DEBUG   ANSI_COLOR_CYAN    "[DEBUG] %s:%d " fmt ANSI_COLOR_RESET "\n", __FILE__, __LINE__, ##__VA_ARGS__); \
+    } while (0)
+#define OSA_log(fmt, ...)    \
+    do { \
+        printk(KERN_DEFAULT          "%s:%d " fmt ANSI_COLOR_RESET "\n", __FILE__, __LINE__, ##__VA_ARGS__); \
+    } while (0)
+#else // LOG_WITH_COLOR
+#define OSA_EMERG(fmt, ...)  \
+    do { \
+        printk(KERN_EMERG   "[EMERG] %s:%d " fmt "\n", __FILE__, __LINE__, ##__VA_ARGS__); \
+    } while (0)
+#define OSA_ALERT(fmt, ...)  \
+    do { \
+        printk(KERN_ALERT   "[ALERT] %s:%d " fmt "\n", __FILE__, __LINE__, ##__VA_ARGS__); \
+    } while (0)
+#define OSA_CRIT(fmt, ...)   \
+    do { \
+        printk(KERN_CRIT    "[CRIT] %s:%d " fmt "\n", __FILE__, __LINE__, ##__VA_ARGS__); \
+    } while (0)
+#define OSA_ERROR(fmt, ...)  \
+    do { \
+        printk(KERN_ERR     "[ERROR] %s:%d " fmt "\n", __FILE__, __LINE__, ##__VA_ARGS__); \
+    } while (0)
+#define OSA_WARN(fmt, ...)   \
+    do { \
+        printk(KERN_WARNING "[WARN] %s:%d " fmt "\n", __FILE__, __LINE__, ##__VA_ARGS__); \
+    } while (0)
+#define OSA_NOTICE(fmt, ...) \
+    do { \
+        printk(KERN_NOTICE  "[NOTICE] %s:%d " fmt "\n", __FILE__, __LINE__, ##__VA_ARGS__); \
+    } while (0)
+#define OSA_INFO(fmt, ...)   \
+    do { \
+        printk(KERN_INFO    "[INFO] %s:%d " fmt "\n", __FILE__, __LINE__, ##__VA_ARGS__); \
+    } while (0)
+#define OSA_DEBUG(fmt, ...)  \
+    do { \
+        printk(KERN_DEBUG   "[DEBUG] %s:%d " fmt "\n", __FILE__, __LINE__, ##__VA_ARGS__); \
+    } while (0)
+#define OSA_log(fmt, ...)    \
+    do { \
+        printk(KERN_DEFAULT "%s:%d " fmt "\n", __FILE__, __LINE__, ##__VA_ARGS__); \
+    } while (0)
+#endif // LOG_WITH_COLOR
 
 #endif // _OSA_LOG_KERN_H

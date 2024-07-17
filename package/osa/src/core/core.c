@@ -4,21 +4,42 @@
 #include "osa.h"
 
 
-OSA_INT32 OSA_init(OSA_VOID);
-OSA_VOID OSA_exit(OSA_VOID);
+INT32 OSA_init(VOID);
+VOID OSA_exit(VOID);
 
-OSA_INT32 OSA_init(OSA_VOID)
+STATIC VOID OSA_logTest(VOID)
 {
-	OSA_INFO("OSA module init.\n");
+    OSA_INFO("Start log module test.");
 
-	OSA_INFO("Hello World!\n");
+    OSA_EMERG("");
+    OSA_ALERT("");
+    OSA_CRIT("");
+    OSA_ERROR("");
+    OSA_WARN("");
+    OSA_NOTICE("");
+    OSA_INFO("");
+    OSA_DEBUG("");
+    OSA_log("");
+
+    return;
+}
+
+
+INT32 OSA_init(VOID)
+{
+	OSA_INFO("OSA module init.");
+
+	OSA_INFO("Hello World!");
+
+    OSA_logTest();
+
 
 	return OSA_SOK;
 }
 
-OSA_VOID OSA_exit(OSA_VOID)
+VOID OSA_exit(VOID)
 {
-	OSA_FATAL("OSA module exit.\n");
+	OSA_INFO("OSA module exit.");
 
 	return;
 }

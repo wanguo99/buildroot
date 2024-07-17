@@ -7,9 +7,9 @@ CROSS_COMPILE ?= arm-wanguo-linux-gnueabihf-
 
 PWD :=$(shell pwd)
 
-$(TARGET)-objs += ./core/core.o \
-				./log/osa_log.o
-EXTRA_CFLAGS += -I$(PWD)/include
+$(TARGET)-objs += core/core.o
+EXTRA_CFLAGS += -I$(PWD)/include \
+				-fmacro-prefix-map=$(PWD)/=
 
 
 .PHONY: all clean

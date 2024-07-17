@@ -1,0 +1,12 @@
+config BR2_PACKAGE_PDL
+	bool "PDL"
+	depends on BR2_PACKAGE_OSA
+	help
+		Peripheral Driver Library Module.
+
+config BR2_PACKAGE_PDL_VERSION
+	string "pdl version"
+	default "0.0.1"
+	depends on BR2_PACKAGE_PDL
+	help
+		Specify the version of the pdl kernel module.

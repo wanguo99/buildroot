@@ -1,5 +1,12 @@
 config BR2_PACKAGE_PCONFIG
 	bool "PCONFIG"
+	depends on BR2_PACKAGE_OSA
 	help
 		Product Config Module.
 
+config BR2_PACKAGE_PCONFIG_VERSION
+	string "pconfig version"
+	default "0.0.1"
+	depends on BR2_PACKAGE_PCONFIG
+	help
+		Specify the version of the pconfig kernel module.

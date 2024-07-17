@@ -1,6 +1,0 @@
-config BR2_PACKAGE_BSP
-	bool "BSP"
-	depends on BR2_PACKAGE_OSA 
-	help
-		Board Support Package Module.
-

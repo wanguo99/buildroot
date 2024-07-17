@@ -1,4 +1,4 @@
-TARGET := pconfig
+TARGET := hal
 obj-m += $(TARGET).o
 
 ARCH ?= arm
@@ -6,11 +6,8 @@ CROSS_COMPILE ?= arm-linux-gnueabihf-
 
 PWD :=$(shell pwd)
 
-SRCS =	pconfig_core.c
-
-ifeq ($(PLATFORM), imx6ull)
-	SRCS += platform/imx6ull/pconfig_imx6ull_alpha.c
-endif
+SRCS = hal_core.c \
+	   gpio/hal_gpio.c 
 
 $(TARGET)-objs = $(SRCS:.c=.o)
 
@@ -20,7 +17,7 @@ EXTRA_CFLAGS += -I$(PWD)/include \
 
 EXTRA_CFLAGS += -fmacro-prefix-map=$(PWD)/=
 
-# 额外的符号表（其他模块导出符号）
+# 棰濆鐨勭鍙疯〃锛堝叾浠栨ā鍧楀鍑虹鍙凤級
 KBUILD_EXTRA_SYMBOLS_PATH = $(STAGING_DIR)/usr/share/Module.symvers
 KBUILD_EXTRA_SYMBOLS += $(KBUILD_EXTRA_SYMBOLS_PATH)/osa/Module.symvers
 

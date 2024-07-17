@@ -1,6 +1,6 @@
 #
 # Automatically generated file; DO NOT EDIT.
-# Buildroot -ge194de1100-dirty Configuration
+# Buildroot -gc675ecbc20-dirty Configuration
 #
 BR2_HAVE_DOT_CONFIG=y
 BR2_HOST_GCC_AT_LEAST_4_9=y
@@ -571,8 +571,26 @@ BR2_LINUX_KERNEL_NEEDS_HOST_OPENSSL=y
 #
 # Wanguo packages
 #
-BR2_PACKAGE_BSP=y
+
+#
+# drivers
+#
 BR2_PACKAGE_OSA=y
+BR2_PACKAGE_OSA_VERSION="0.0.1"
+BR2_PACKAGE_PCONFIG=y
+BR2_PACKAGE_PCONFIG_VERSION="0.0.1"
+BR2_PACKAGE_HAL=y
+BR2_PACKAGE_HAL_VERSION="0.0.1"
+BR2_PACKAGE_PDL=y
+BR2_PACKAGE_PDL_VERSION="0.0.1"
+
+#
+# libs
+#
+
+#
+# apps
+#
 BR2_PACKAGE_BUSYBOX=y
 BR2_PACKAGE_BUSYBOX_CONFIG="package/busybox/busybox.config"
 BR2_PACKAGE_BUSYBOX_CONFIG_FRAGMENT_FILES=""

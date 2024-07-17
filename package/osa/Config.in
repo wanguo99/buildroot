@@ -1,5 +1,12 @@
 config BR2_PACKAGE_OSA
 	bool "OSA"
+	default y
 	help
-		Operation System Adaptor Module.
+		Enable The Operation System Adaptor Module.
 
+config BR2_PACKAGE_OSA_VERSION
+	string "osa version"
+	default "0.0.1"
+	depends on BR2_PACKAGE_OSA
+	help
+		Specify the version of the osa kernel module.

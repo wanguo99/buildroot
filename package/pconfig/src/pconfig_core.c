@@ -10,11 +10,6 @@ INT32 PCONFIG_init(VOID)
 {
 	OSA_INFO("PCONFIG module init.");
 
-	OSA_INFO("Hello World!");
-
-    OSA_logTest();
-
-
 	return OSA_SOK;
 }
 

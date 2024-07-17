@@ -30,10 +30,7 @@ INT32 OSA_init(VOID)
 {
 	OSA_INFO("OSA module init.");
 
-	OSA_INFO("Hello World!");
-
     OSA_logTest();
-
 
 	return OSA_SOK;
 }

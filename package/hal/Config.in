@@ -1,0 +1,12 @@
+config BR2_PACKAGE_HAL
+	bool "HAL"
+	depends on BR2_PACKAGE_OSA
+	help
+		Hardware Abstraction Layer Module.
+
+config BR2_PACKAGE_HAL_VERSION
+	string "hal version"
+	default "0.0.1"
+	depends on BR2_PACKAGE_HAL
+	help
+		Specify the version of the hal kernel module.

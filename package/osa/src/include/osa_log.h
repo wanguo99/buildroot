@@ -1,5 +1,5 @@
-#ifndef _OSA_LOG_KERN_H
-#define _OSA_LOG_KERN_H
+#ifndef _OSA_LOG_H_
+#define _OSA_LOG_H_
 
 #include <linux/kernel.h>
 #include <linux/module.h>
@@ -96,4 +96,4 @@
     } while (0)
 #endif // LOG_WITH_COLOR
 
-#endif // _OSA_LOG_KERN_H
+#endif // _OSA_LOG_H_

@@ -1,3 +1,4 @@
+#if 0
 #include <linux/kernel.h>
 #include <linux/stdarg.h>
 #include <linux/slab.h>
@@ -170,3 +171,4 @@ VOID OSA_log(INT32 level, CONST INT8 *file, INT32 line, CONST INT8 *fmt, ...)
     unlock();
     va_end(ev.ap);
 }
+#endif

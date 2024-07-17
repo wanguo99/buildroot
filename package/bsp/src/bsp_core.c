@@ -2,8 +2,7 @@
 #include <linux/module.h>
 
 #include "osa/osa.h"
-
-//#include "bsp.h"
+#include "bsp.h"
 
 INT32 BSP_init(VOID);
 void BSP_exit(VOID);

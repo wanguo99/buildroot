@@ -6,7 +6,11 @@ CROSS_COMPILE ?= arm-linux-gnueabihf-
 
 PWD :=$(shell pwd)
 
-$(TARGET)-objs += core/core.o
+SRCS = bsp_core.c \
+	   led/bsp_led.c 
+
+$(TARGET)-objs = $(SRCS:.c=.o)
+
 EXTRA_CFLAGS += -I$(PWD)/include \
 				-I$(STAGING_DIR)/include \
 				-I$(STAGING_DIR)/usr/include

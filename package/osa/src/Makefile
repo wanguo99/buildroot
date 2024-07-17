@@ -1,4 +1,3 @@
-
 TARGET := osa
 obj-m += $(TARGET).o
 
@@ -7,7 +6,11 @@ CROSS_COMPILE ?= arm-linux-gnueabihf-
 
 PWD :=$(shell pwd)
 
-$(TARGET)-objs += core/core.o
+SRCS = osa_core.c \
+	   log/osa_log.c 
+
+$(TARGET)-objs = $(SRCS:.c=.o)
+
 EXTRA_CFLAGS += -I$(PWD)/include \
 				-I$(STAGING_DIR)/include \
 				-I$(STAGING_DIR)/usr/include

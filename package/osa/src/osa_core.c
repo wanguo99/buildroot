@@ -4,11 +4,11 @@
 #include "osa.h"
 
 
-STATIC INT32 OSA_init(VOID);
-STATIC VOID OSA_exit(VOID);
+static INT32 OSA_init(VOID);
+static VOID OSA_exit(VOID);
 
 
-STATIC VOID OSA_logTest(VOID)
+static VOID OSA_logTest(VOID)
 {
     OSA_INFO("Start log module test.");
 

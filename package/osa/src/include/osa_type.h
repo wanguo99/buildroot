@@ -11,12 +11,6 @@
 #define OSA_isFail(x)       ((x) == OSA_EFAIL)      /* 判断返回值是否为failed */
 
 
-
-#define CONST               const                   /* const类型 */
-#define STATIC              static                  /* static类型 */
-#define EXTERN              extern                  /* extern类型 */
-
-
 typedef void                VOID;                   /* void数据类型 */
 typedef bool                BOOL;                   /* bool数据类型 */
 

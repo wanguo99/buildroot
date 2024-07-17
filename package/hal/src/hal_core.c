@@ -4,17 +4,17 @@
 #include "osa/osa.h"
 #include "hal.h"
 
-STATIC INT32 HAL_init(VOID);
-STATIC VOID HAL_exit(VOID);
+static INT32 HAL_init(VOID);
+static VOID HAL_exit(VOID);
 
-STATIC INT32 HAL_init(VOID)
+static INT32 HAL_init(VOID)
 {
     OSA_INFO("HAL module init.");
 
     return 0;
 }
 
-STATIC VOID HAL_exit(VOID)
+static VOID HAL_exit(VOID)
 {
     OSA_INFO("HAL module exit.");
 

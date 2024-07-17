@@ -4,10 +4,10 @@
 #include "osa/osa.h"
 #include "pdl.h"
 
-STATIC INT32 PDL_init(VOID);
-STATIC VOID PDL_exit(VOID);
+static INT32 PDL_init(VOID);
+static VOID PDL_exit(VOID);
 
-STATIC INT32 PDL_init(VOID)
+static INT32 PDL_init(VOID)
 {
     OSA_INFO("PDL module init.");
 
@@ -16,7 +16,7 @@ STATIC INT32 PDL_init(VOID)
     return 0;
 }
 
-STATIC VOID PDL_exit(VOID)
+static VOID PDL_exit(VOID)
 {
     OSA_INFO("PDL module exit.");
 

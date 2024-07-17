@@ -3,17 +3,17 @@
 #include "osa/osa.h"
 
 
-STATIC INT32 PCONFIG_init(VOID);
-STATIC VOID PCONFIG_exit(VOID);
+static INT32 PCONFIG_init(VOID);
+static VOID PCONFIG_exit(VOID);
 
-STATIC INT32 PCONFIG_init(VOID)
+static INT32 PCONFIG_init(VOID)
 {
 	OSA_INFO("PCONFIG module init.");
 
 	return OSA_SOK;
 }
 
-STATIC VOID PCONFIG_exit(VOID)
+static VOID PCONFIG_exit(VOID)
 {
 	OSA_INFO("PCONFIG module exit.");
 

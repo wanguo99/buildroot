@@ -21,18 +21,18 @@ typedef struct
     spinlock_t  lock;                       // 自旋锁
 } log_state_t;
 
-STATIC log_state_t log_state =
+static log_state_t log_state =
 {
     .lock = __SPIN_LOCK_UNLOCKED(log_state.lock)
 };
 
-STATIC CONST INT8 *level_strings[] =
+static const INT8 *level_strings[] =
 {
     "TRACE", "DEBUG", "INFO", "WARN", "ERROR", "FATAL"
 };
 
 #ifdef LOG_USE_COLOR
-STATIC CONST INT8 *level_colors[] =
+static const INT8 *level_colors[] =
 {
     "\x1b[94m", // TRACE -> Bright Blue
     "\x1b[36m", // DEBUG -> Cyan
@@ -43,7 +43,7 @@ STATIC CONST INT8 *level_colors[] =
 };
 #endif
 
-STATIC VOID stdout_callback(log_Event *ev)
+static VOID stdout_callback(log_Event *ev)
 {
 
 #ifdef LOG_USE_COLOR
@@ -55,7 +55,7 @@ STATIC VOID stdout_callback(log_Event *ev)
 #endif
 }
 
-STATIC VOID lock(VOID)
+static VOID lock(VOID)
 {
     if (log_state.lock_fn)
     {
@@ -67,7 +67,7 @@ STATIC VOID lock(VOID)
     }
 }
 
-STATIC VOID unlock(VOID)
+static VOID unlock(VOID)
 {
     if (log_state.lock_fn)
     {
@@ -79,7 +79,7 @@ STATIC VOID unlock(VOID)
     }
 }
 
-CONST INT8* log_level_string(INT32 level)
+const INT8* log_level_string(INT32 level)
 {
     return level_strings[level];
 }
@@ -126,12 +126,12 @@ INT32 log_add_callback(log_log_fn fn, VOID *udata, INT32 level)
     return result;
 }
 
-STATIC VOID init_event(log_Event *ev, VOID *udata)
+static VOID init_event(log_Event *ev, VOID *udata)
 {
     ev->udata = udata;
 }
 
-VOID OSA_log(INT32 level, CONST INT8 *file, INT32 line, CONST INT8 *fmt, ...)
+static OSA_log(INT32 level, const INT8 *file, INT32 line, const INT8 *fmt, ...)
 {
     INT32 index;
 

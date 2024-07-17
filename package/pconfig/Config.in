@@ -1,0 +1,5 @@
+config BR2_PACKAGE_PCONFIG
+	bool "PCONFIG"
+	help
+		Product Config Module.
+

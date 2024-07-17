@@ -4,10 +4,10 @@
 #include "osa/osa.h"
 #include "pdl.h"
 
-INT32 PDL_init(VOID);
-void PDL_exit(VOID);
+STATIC INT32 PDL_init(VOID);
+STATIC VOID PDL_exit(VOID);
 
-INT32 PDL_init(VOID)
+STATIC INT32 PDL_init(VOID)
 {
     OSA_INFO("PDL module init.");
 
@@ -16,7 +16,7 @@ INT32 PDL_init(VOID)
     return 0;
 }
 
-VOID PDL_exit(VOID)
+STATIC VOID PDL_exit(VOID)
 {
     OSA_INFO("PDL module exit.");
 
@@ -30,4 +30,4 @@ module_exit(PDL_exit);
 
 MODULE_LICENSE("GPL");
 MODULE_AUTHOR("Guo Hao");
-MODULE_DESCRIPTION("Board Support Package Module");
+MODULE_DESCRIPTION("Peripheral Driver Library Module");

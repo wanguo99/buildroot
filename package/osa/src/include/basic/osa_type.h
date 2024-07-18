@@ -3,14 +3,6 @@
 
 #include <linux/types.h>
 
-#define OSA_SOK             (0)                     /* 成功返回值 */
-#define OSA_EFAIL           (-1)                    /* 失败返回值 */
-
-#define OSA_isSuccess(x)    ((x) == OSA_SOK)        /* 判断返回值是否为success */
-#define OSA_isNotSuccess(x) ((x) != OSA_SOK)        /* 判断返回值是否不为success */
-#define OSA_isFail(x)       ((x) == OSA_EFAIL)      /* 判断返回值是否为failed */
-
-
 typedef void                VOID;                   /* void数据类型 */
 typedef bool                BOOL;                   /* bool数据类型 */
 

@@ -21,7 +21,8 @@ typedef struct class        OSA_class_t;
 /*************************************************************************/
 /*                             函数声明                                       */
 /*************************************************************************/
-extern INT32 OSA_class_create(OSA_class_t **cls, const INT8 *name);
-extern INT32 OSA_class_delete(OSA_class_t **cls);
+extern INT32 OSA_class_create(OSA_class_t **ppstClass, const INT8 *name);
+
+extern VOID OSA_class_delete(OSA_class_t **ppstClass);
 
 #endif // _OSA_CLASS_H_

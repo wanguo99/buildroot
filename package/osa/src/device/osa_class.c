@@ -3,16 +3,33 @@
 #include "osa_class_priv.h"
 
 
-INT32 OSA_class_create(OSA_class_t **cls, const INT8 *name)
+INT32 OSA_class_create(OSA_class_t **ppstClass, const INT8 *pcName)
 {
-//    *cls = malloc(sizeof());
+    if (OSA_isNull(ppstClass) || OSA_isNull(pcName))
+    {
+        return OSA_EINVAL;
+    }
+
+    *ppstClass = class_create(pcName);
+    if (IS_ERR(*ppstClass))
+    {
+        return OSA_EFAIL;
+    }
+
     return OSA_SOK;
 }
 EXPORT_SYMBOL_GPL(OSA_class_create);
 
 
-INT32 OSA_class_delete(OSA_class_t **cls)
+VOID OSA_class_delete(OSA_class_t **ppstClass)
 {
-    return OSA_SOK;
+    if (OSA_isNull(ppstClass))
+    {
+        return;
+    }
+
+    class_destroy(*ppstClass);
+
+    return;
 }
 EXPORT_SYMBOL_GPL(OSA_class_delete);

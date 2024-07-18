@@ -2,6 +2,7 @@
 #define _OSA_H_
 
 #include "basic/osa_type.h"
+#include "basic/osa_errno.h"
 #include "basic/osa_log.h"
 #include "device/osa_cdev.h"
 #include "device/osa_class.h"

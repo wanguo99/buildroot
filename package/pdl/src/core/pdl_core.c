@@ -26,20 +26,13 @@ static INT32 PDL_class_create(VOID)
     return OSA_SOK;
 }
 
-static INT32 PDL_class_delete(VOID)
+static VOID PDL_class_delete(VOID)
 {
-    INT32 iRet = OSA_EFAIL;
-
-    iRet = OSA_class_delete(&g_pdlClassHdl);
-    if (OSA_isFail(iRet))
-    {
-        OSA_ERROR("Failed to delete device class: %s", PDL_CLASS_NAME);
-        return iRet;
-    }
+    OSA_class_delete(&g_pdlClassHdl);
 
     OSA_INFO("Delete device class %s ok.", PDL_CLASS_NAME);
 
-    return OSA_SOK;
+    return;
 }
 
 static INT32 PDL_init(VOID)
@@ -62,18 +55,11 @@ static INT32 PDL_init(VOID)
 
 static VOID PDL_exit(VOID)
 {
-    INT32 iRet = OSA_EFAIL;
-
     OSA_INFO("PDL module exit.");
 
     PDL_ledExit();
 
-    iRet = PDL_class_delete();
-    if (OSA_isFail(iRet))
-    {
-        OSA_ERROR("PDL_class_delete faled.");
-        return;
-    }
+    PDL_class_delete();
 
     return;
 }

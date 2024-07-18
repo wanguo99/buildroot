@@ -1,12 +1,27 @@
 #ifndef _OSA_CDEV_H_
 #define _OSA_CDEV_H_
 
+/*************************************************************************/
+/*                             头文件                                       */
+/*************************************************************************/
 #include <linux/fs.h>
 #include <linux/cdev.h>
 #include <linux/device.h>
 #include <linux/device/class.h>
 
+
+/*************************************************************************/
+/*                             宏定义                                       */
+/*************************************************************************/
+
 #define OSA_CDEV_NAME_MAX_LEN       (16)
+
+
+
+/*************************************************************************/
+/*                        结构体、数据类型                                       */
+/*************************************************************************/
+
 
 typedef struct tagOSA_cdev_t
 {
@@ -20,8 +35,15 @@ typedef struct tagOSA_cdev_t
     struct device *device;                  /* 设备句柄 */
 } OSA_cdev_t;
 
-extern INT32 OSA_cdev_create(OSA_cdev_t *pstCdev, INT8 *pcName);
 
+
+
+/*************************************************************************/
+/*                             函数声明                                      */
+/*************************************************************************/
+
+
+extern INT32 OSA_cdev_create(OSA_cdev_t *pstCdev, INT8 *pcName);
 extern VOID OSA_cdev_delete(OSA_cdev_t *ppstCdev);
 
 #endif // _OSA_CDEV_H_

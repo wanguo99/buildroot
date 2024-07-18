@@ -15,7 +15,8 @@ EXTRA_CFLAGS += -I$(PWD)/include \
 				-I$(STAGING_DIR)/include \
 				-I$(STAGING_DIR)/usr/include
 
-EXTRA_CFLAGS += -fmacro-prefix-map=$(PWD)/=
+EXTRA_CFLAGS += -fmacro-prefix-map=$(PWD)/= \
+				-Wno-missing-prototypes
 
 # 额外的符号表（其他模块导出符号）
 KBUILD_EXTRA_SYMBOLS_PATH = $(STAGING_DIR)/usr/share/Module.symvers

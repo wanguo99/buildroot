@@ -12,8 +12,6 @@ INT32 OSA_proc_create(OSA_proc_t *pstProcFile, const INT8 *pcName)
         return OSA_EINVAL;
     }
 
-    OSA_INFO("");
-
     pstProcFile->entry = proc_create(pcName, 0666, NULL, pstProcFile->fops);
     if (OSA_isNull(pstProcFile->entry))
     {
@@ -34,8 +32,6 @@ VOID OSA_proc_delete(OSA_proc_t *pstProcFile)
     {
         return;
     }
-
-    OSA_INFO("");
 
     proc_remove(pstProcFile->entry);
 

@@ -1,0 +1,12 @@
+config BR2_PACKAGE_WGTOOL
+	bool "WGTOOL"
+	depends on BR2_PACKAGE_OSA
+	help
+		wanguo test app.
+
+config BR2_PACKAGE_WGTOOL_VERSION
+	string "wgtool version"
+	default "0.0.1"
+	depends on BR2_PACKAGE_WGTOOL
+	help
+		Specify the version of the wgtool app.

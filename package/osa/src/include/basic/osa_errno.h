@@ -23,6 +23,8 @@
 #define OSA_isNull(ptr)     ((ptr) == NULL)         /* 判断指针是否为空 */
 #define OSA_isNotNull(ptr)  ((ptr) != NULL)         /* 判断指针是否不为空 */
 
+#define OSA_isZero(x)       ((x) == 0)              /* 判断数字是否为0 */
+#define OSA_isNotZero(x)    ((x) != 0)              /* 判断数字是否不为0 */
 
 
 /*************************************************************************/

@@ -50,7 +50,12 @@ static INT32 PDL_submodule_init(VOID)
     iRet = PDL_LED_init();
     if (OSA_isFail(iRet))
     {
-        OSA_ERROR("PDL_led_init failed.");
+        OSA_ERROR("PDL_LED_init failed.");
+    }
+    iRet = PDL_KEY_init();
+    if (OSA_isFail(iRet))
+    {
+        OSA_ERROR("PDL_KEY_init failed.");
     }
 
     return OSA_SOK;
@@ -58,6 +63,7 @@ static INT32 PDL_submodule_init(VOID)
 
 static VOID PDL_submodule_exit(VOID)
 {
+    PDL_KEY_exit();
     PDL_LED_exit();
 
     return;

@@ -10,6 +10,7 @@ endmenu
 menu "libs"
 endmenu
 menu "apps"
+	source "package/wgtool/Config.in"
 endmenu
 endmenu
 

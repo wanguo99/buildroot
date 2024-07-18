@@ -74,7 +74,11 @@
     } while (0)
 #define OSA_log(fmt, ...)    \
     do { \
-        printk(KERN_DEFAULT          "[%s:%d] [%s] " fmt ANSI_COLOR_RESET "\n", __FILE__, __LINE__, __func__, ##__VA_ARGS__); \
+        printk(KERN_DEFAULT "[%s:%d] [%s] " fmt ANSI_COLOR_RESET "\n", __FILE__, __LINE__, __func__, ##__VA_ARGS__); \
+    } while (0)
+#define OSA_print(fmt, ...)    \
+    do { \
+        printk(KERN_DEFAULT ANSI_COLOR_GREEN fmt ANSI_COLOR_RESET "\n", ##__VA_ARGS__); \
     } while (0)
 #else // LOG_WITH_COLOR
 #define OSA_EMERG(fmt, ...)  \
@@ -112,6 +116,10 @@
 #define OSA_log(fmt, ...)    \
     do { \
         printk(KERN_DEFAULT "[%s:%d] [%s] " fmt "\n", __FILE__, __LINE__, __func__, ##__VA_ARGS__); \
+    } while (0)
+#define OSA_print(fmt, ...)    \
+    do { \
+        printk(KERN_DEFAULT fmt "\n", ##__VA_ARGS__); \
     } while (0)
 #endif // LOG_WITH_COLOR
 

@@ -10,7 +10,7 @@ static VOID OSA_exit(VOID);
 
 static VOID OSA_logTest(VOID)
 {
-    OSA_INFO("Start log module test.");
+    OSA_INFO("OSA_log module test start.");
 
     OSA_EMERG("");
     OSA_ALERT("");
@@ -21,6 +21,8 @@ static VOID OSA_logTest(VOID)
     OSA_INFO("");
     OSA_DEBUG("");
     OSA_log("");
+
+    OSA_INFO("OSA_log module test ok.");
 
     return;
 }

@@ -10,9 +10,10 @@
 /*                             宏定义                                       */
 /*************************************************************************/
 #define PDL_LED_CDEV_NAME       "pdl_led"
+#define PDL_LED_CDEV_COUNT      (1)
+
 #define PDL_LED_PROC_NAME       "pdl_led"
-
-
+#define PDL_LED_PROC_CMD_LEN    (1)
 
 /*************************************************************************/
 /*                        结构体、数据类型                                       */

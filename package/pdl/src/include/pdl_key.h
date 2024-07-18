@@ -1,20 +1,14 @@
-#ifndef _PDL_KEY_PRIV_H_
-#define _PDL_KEY_PRIV_H_
+#ifndef _PDL_KEY_H_
+#define _PDL_KEY_H_
 /*************************************************************************/
 /*                             头文件                                       */
 /*************************************************************************/
-
-
+#include "osa/osa.h"
 
 /*************************************************************************/
 /*                             宏定义                                       */
 /*************************************************************************/
-#define PDL_KEY_CDEV_NAME       "pdl_key"
-#define PDL_KEY_CDEV_COUNT      (1)
-
-#define PDL_KEY_PROC_NAME       "pdl_key"
-#define PDL_KEY_PROC_CMD_LEN    (1)
-
+#define KEY_IOC_MAGIC 'K'
 
 
 /*************************************************************************/
@@ -26,5 +20,8 @@
 /*                             函数声明                                      */
 /*************************************************************************/
 
+extern INT32 PDL_KEY_init(VOID);
+extern VOID PDL_KEY_exit(VOID);
 
-#endif // _PDL_KEY_PRIV_H_
+
+#endif // _PDL_KEY_H_

@@ -1,11 +1,27 @@
-#ifndef _OSA_CDEV_H_
-#define _OSA_CDEV_H_
+#ifndef _OSA_CLASS_H_
+#define _OSA_CLASS_H_
 
 #include <linux/fs.h>
+#include <linux/device/class.h>
+
+/*************************************************************************/
+/*                             宏定义                                       */
+/*************************************************************************/
+#define OSA_CLASS_NAME_NAX_LEN  (16)
 
 
-extern INT32 OSA_cdev_create(VOID);
 
-extern INT32 OSA_cdev_delete(VOID);
+/*************************************************************************/
+/*                             数据结构                                       */
+/*************************************************************************/
+typedef struct class        OSA_class_t;
 
-#endif // _OSA_CDEV_H_
+
+
+/*************************************************************************/
+/*                             函数声明                                       */
+/*************************************************************************/
+extern INT32 OSA_class_create(OSA_class_t **cls, const INT8 *name);
+extern INT32 OSA_class_delete(OSA_class_t **cls);
+
+#endif // _OSA_CLASS_H_

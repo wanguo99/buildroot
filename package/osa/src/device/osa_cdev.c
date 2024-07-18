@@ -1,5 +1,4 @@
 #include "osa.h"
-
 #include "osa_cdev_priv.h"
 
 

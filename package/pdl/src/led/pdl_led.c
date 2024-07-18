@@ -9,10 +9,10 @@ INT32 PDL_ledInit(VOID)
 
     OSA_INFO("");
 
-    iRet = OSA_cdevCreate();
+    iRet = OSA_cdev_create();
     if (OSA_isNotSuccess(iRet))
     {
-        OSA_ERROR("OSA_cdevCreate failed.");
+        OSA_ERROR("OSA_cdev_create failed.");
         return OSA_EFAIL;
     }
 
@@ -26,10 +26,10 @@ INT32 PDL_ledExit(VOID)
 
     OSA_INFO("");
 
-    iRet = OSA_cdevDelete();
+    iRet = OSA_cdev_delete();
     if (OSA_isNotSuccess(iRet))
     {
-        OSA_ERROR("OSA_cdevDelete failed.");
+        OSA_ERROR("OSA_cdev_delete failed.");
     }
 
     return OSA_SOK;

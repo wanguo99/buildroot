@@ -8,24 +8,52 @@
 static INT32 PDL_init(VOID);
 static VOID PDL_exit(VOID);
 
+OSA_class_t *g_pdlClassHdl = NULL;
 
 static INT32 PDL_class_create(VOID)
 {
-    // Register the device class
-    osaClass = class_create(THIS_MODULE, PDL_CLASS_NAME);
-    if (IS_ERR(osaClass)) {
-        printk(KERN_ALERT "Failed to register device class\n");
-        return PTR_ERR(osaClass);
-    }
-    printk(KERN_INFO "OSA_cdev: device class registered correctly\n");
+    INT32 iRet = OSA_EFAIL;
 
+    iRet = OSA_class_create(&g_pdlClassHdl, PDL_CLASS_NAME);
+    if (OSA_isFail(iRet))
+    {
+        OSA_ERROR("Failed to create device class: %s", PDL_CLASS_NAME);
+        return iRet;
+    }
+
+    OSA_INFO("Create device class %s ok.", PDL_CLASS_NAME);
+
+    return OSA_SOK;
 }
+
+static INT32 PDL_class_delete(VOID)
+{
+    INT32 iRet = OSA_EFAIL;
+
+    iRet = OSA_class_delete(&g_pdlClassHdl);
+    if (OSA_isFail(iRet))
+    {
+        OSA_ERROR("Failed to delete device class: %s", PDL_CLASS_NAME);
+        return iRet;
+    }
+
+    OSA_INFO("Delete device class %s ok.", PDL_CLASS_NAME);
+
+    return OSA_SOK;
+}
+
 static INT32 PDL_init(VOID)
 {
+    INT32 iRet = OSA_EFAIL;
+
     OSA_INFO("PDL module init.");
 
-
-
+    iRet = PDL_class_create();
+    if (OSA_isFail(iRet))
+    {
+        OSA_ERROR("PDL_class_create faled.");
+        return OSA_EFAIL;
+    }
 
     PDL_ledInit();
 
@@ -34,9 +62,18 @@ static INT32 PDL_init(VOID)
 
 static VOID PDL_exit(VOID)
 {
+    INT32 iRet = OSA_EFAIL;
+
     OSA_INFO("PDL module exit.");
 
     PDL_ledExit();
+
+    iRet = PDL_class_delete();
+    if (OSA_isFail(iRet))
+    {
+        OSA_ERROR("PDL_class_delete faled.");
+        return;
+    }
 
     return;
 }

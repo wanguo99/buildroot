@@ -1,6 +1,6 @@
 #
 # Automatically generated file; DO NOT EDIT.
-# Buildroot 2024.05-624-g7369dd6478-dirty Configuration
+# Buildroot -ga2216d28ed-dirty Configuration
 #
 BR2_HAVE_DOT_CONFIG=y
 BR2_HOST_GCC_AT_LEAST_4_9=y
@@ -591,6 +591,8 @@ BR2_PACKAGE_PDL_VERSION="0.0.1"
 #
 # apps
 #
+BR2_PACKAGE_WGTOOL=y
+BR2_PACKAGE_WGTOOL_VERSION="0.0.1"
 BR2_PACKAGE_BUSYBOX=y
 BR2_PACKAGE_BUSYBOX_CONFIG="package/busybox/busybox.config"
 BR2_PACKAGE_BUSYBOX_CONFIG_FRAGMENT_FILES=""

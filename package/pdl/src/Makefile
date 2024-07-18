@@ -6,7 +6,7 @@ CROSS_COMPILE ?= arm-linux-gnueabihf-
 
 PWD :=$(shell pwd)
 
-SRCS = pdl_core.c \
+SRCS = core/pdl_core.c \
 	   led/pdl_led.c 
 
 $(TARGET)-objs = $(SRCS:.c=.o)

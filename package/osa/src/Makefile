@@ -6,9 +6,10 @@ CROSS_COMPILE ?= arm-linux-gnueabihf-
 
 PWD :=$(shell pwd)
 
-SRCS = osa_core.c \
-	  log/osa_log.c \
-	  cdev/osa_cdev.c 
+SRCS = core/osa_core.c \
+	  basic/osa_log.c \
+	  device/osa_cdev.c \
+	  device/osa_class.c
 
 $(TARGET)-objs = $(SRCS:.c=.o)
 

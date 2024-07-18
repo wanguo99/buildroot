@@ -8,6 +8,7 @@ PWD :=$(shell pwd)
 
 SRCS = core/osa_core.c \
 	  basic/osa_log.c \
+	  fs/osa_proc.c \
 	  device/osa_cdev.c \
 	  device/osa_class.c
 

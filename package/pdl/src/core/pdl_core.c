@@ -43,6 +43,50 @@ static VOID PDL_class_delete(VOID)
     return;
 }
 
+static INT32 PDL_submodule_init(VOID)
+{
+#if 1
+        PDL_ledInit();
+#else
+        CFG_get_config();
+
+        for (index = 0; index < sizeof(cfgs)/sizeof(cfg); index++)
+        {
+            switch (cfg[index].module)
+            {
+                case PDL_MODULE_LED:
+                {
+                    PDL_ledInit();
+                }
+            }
+        }
+#endif
+
+    return OSA_SOK;
+}
+
+static VOID PDL_submodule_exit(VOID)
+{
+#if 1
+        PDL_ledExit();
+#else
+        CFG_get_config();
+
+        for (index = 0; index < sizeof(cfgs)/sizeof(cfg); index++)
+        {
+            switch (cfg[index].module)
+            {
+                case PDL_MODULE_LED:
+                {
+                    PDL_ledExit();
+                }
+            }
+        }
+#endif
+
+    return;
+}
+
 static INT32 PDL_init(VOID)
 {
     INT32 iRet = OSA_EFAIL;
@@ -60,19 +104,32 @@ static INT32 PDL_init(VOID)
     if (OSA_isFail(iRet))
     {
         OSA_ERROR("PDL_class_create faled.");
-        return OSA_EFAIL;
+        goto class_error;
     }
 
-    PDL_ledInit();
+    iRet = PDL_submodule_init();
+    if (OSA_isFail(iRet))
+    {
+        OSA_ERROR("PDL_submodule_init faled.");
+        goto submodule_error;
+    }
 
-    return 0;
+    return OSA_SOK;
+
+submodule_error:
+    PDL_class_delete();
+
+class_error:
+    kfree(g_pstPdlPrivData);
+
+    return OSA_EFAIL;
 }
 
 static VOID PDL_exit(VOID)
 {
     OSA_INFO("PDL module exit.");
 
-    PDL_ledExit();
+    PDL_submodule_exit();
 
     PDL_class_delete();
 

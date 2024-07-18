@@ -3,6 +3,7 @@
 
 #include "osa/osa.h"
 
+#define PDL_LED_CDEV_NAME       "pdl_led"
 
 extern INT32 PDL_ledInit(VOID);
 extern INT32 PDL_ledExit(VOID);

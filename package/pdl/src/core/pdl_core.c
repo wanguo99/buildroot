@@ -1,5 +1,6 @@
 #include <linux/kernel.h>
 #include <linux/module.h>
+#include <linux/slab.h>
 
 #include "osa/osa.h"
 #include "pdl.h"
@@ -8,13 +9,20 @@
 static INT32 PDL_init(VOID);
 static VOID PDL_exit(VOID);
 
-OSA_class_t *g_pdlClassHdl = NULL;
+
+static PDL_PRIVATE_DATA_t *g_pstPdlPrivData = NULL;
+
+OSA_class_t *PDL_get_class_handler(VOID)
+{
+    return g_pstPdlPrivData->pstClass;
+}
+EXPORT_SYMBOL_GPL(PDL_get_class_handler);
 
 static INT32 PDL_class_create(VOID)
 {
     INT32 iRet = OSA_EFAIL;
 
-    iRet = OSA_class_create(&g_pdlClassHdl, PDL_CLASS_NAME);
+    iRet = OSA_class_create(&g_pstPdlPrivData->pstClass, PDL_CLASS_NAME);
     if (OSA_isFail(iRet))
     {
         OSA_ERROR("Failed to create device class: %s", PDL_CLASS_NAME);
@@ -28,7 +36,7 @@ static INT32 PDL_class_create(VOID)
 
 static VOID PDL_class_delete(VOID)
 {
-    OSA_class_delete(&g_pdlClassHdl);
+    OSA_class_delete(&g_pstPdlPrivData->pstClass);
 
     OSA_INFO("Delete device class %s ok.", PDL_CLASS_NAME);
 
@@ -40,6 +48,13 @@ static INT32 PDL_init(VOID)
     INT32 iRet = OSA_EFAIL;
 
     OSA_INFO("PDL module init.");
+
+    g_pstPdlPrivData = kzalloc(sizeof(PDL_PRIVATE_DATA_t), GFP_KERNEL);
+    if (OSA_isNull(g_pstPdlPrivData))
+    {
+        OSA_ERROR("Init PDL Priv Data failed.");
+        return OSA_EFAIL;
+    }
 
     iRet = PDL_class_create();
     if (OSA_isFail(iRet))
@@ -60,6 +75,8 @@ static VOID PDL_exit(VOID)
     PDL_ledExit();
 
     PDL_class_delete();
+
+    kfree(g_pstPdlPrivData);
 
     return;
 }

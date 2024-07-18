@@ -3,5 +3,8 @@
 
 #include "pdl_led.h"
 
-#endif // _PDL_H_ 
+
+extern OSA_class_t *PDL_get_class_handler(VOID);
+
+#endif // _PDL_H_
 

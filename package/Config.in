@@ -1,19 +1,20 @@
-menu "Target packages"
-
 menu "Wanguo packages"
 menu "drivers"
 	source "package/osa/Config.in"
-	source "package/cfg/Config.in"
-	source "package/hal/Config.in"
 	source "package/pdl/Config.in"
-endmenu
+	source "package/hal/Config.in"
+	source "package/cfg/Config.in"
+endmenu # end of drivers
+
 menu "libs"
-endmenu
+endmenu	# end of libs
+
 menu "apps"
 	source "package/wgtool/Config.in"
-endmenu
-endmenu
+endmenu # end of apps
+endmenu	# end of Wanguo packages
 
+menu "Target packages"
 	source "package/busybox/Config.in"
 	source "package/skeleton/Config.in"
 	source "package/skeleton-custom/Config.in"

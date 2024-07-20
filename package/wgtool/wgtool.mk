@@ -3,8 +3,12 @@
 # WGTOOL: wgtool test app
 #
 ################################################################################
+ifeq ($(BR2_PACKAGE_WGTOOL_VERSION),)
+  OSA_VERSION = 1.0.0
+else
+  OSA_VERSION = $(BR2_PACKAGE_WGTOOL_VERSION)
+endif
 
-WGTOOL_VERSION = 1.0.0
 
 # Top-level directory of the source code
 WGTOOL_SITE = $(TOPDIR)/package/wgtool/src

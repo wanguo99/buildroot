@@ -6,7 +6,7 @@ config BR2_PACKAGE_PDL
 
 config BR2_PACKAGE_PDL_VERSION
 	string "pdl version"
-	default "0.0.1"
+	default "1.0.0"
 	depends on BR2_PACKAGE_PDL
 	help
 		Specify the version of the pdl kernel module.

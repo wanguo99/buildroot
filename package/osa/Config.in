@@ -6,7 +6,7 @@ config BR2_PACKAGE_OSA
 
 config BR2_PACKAGE_OSA_VERSION
 	string "osa version"
-	default "0.0.1"
+	default "1.0.0"
 	depends on BR2_PACKAGE_OSA
 	help
 		Specify the version of the osa kernel module.

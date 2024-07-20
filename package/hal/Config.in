@@ -6,7 +6,7 @@ config BR2_PACKAGE_HAL
 
 config BR2_PACKAGE_HAL_VERSION
 	string "hal version"
-	default "0.0.1"
+	default "1.0.0"
 	depends on BR2_PACKAGE_HAL
 	help
 		Specify the version of the hal kernel module.

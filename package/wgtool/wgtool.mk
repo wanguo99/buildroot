@@ -4,9 +4,9 @@
 #
 ################################################################################
 ifeq ($(BR2_PACKAGE_WGTOOL_VERSION),)
-  OSA_VERSION = 1.0.0
+  WGTOOL_VERSION = 1.0.0
 else
-  OSA_VERSION = $(BR2_PACKAGE_WGTOOL_VERSION)
+  WGTOOL_VERSION = $(BR2_PACKAGE_WGTOOL_VERSION)
 endif
 
 

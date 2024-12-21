@@ -114,6 +114,11 @@ main()
 		--outputpath "${BINARIES_DIR}" \
 		--config "${GENIMAGE_CFG}"
 
+	if [ ! -d "${HOME}/tftp" ]; then
+		mkdir -p ${HOME}/tftp
+	fi
+	cp -f ${BINARIES_DIR}/sdcard.img ${HOME}/tftp/
+
 	rm -f "${GENIMAGE_CFG}"
 
 	exit $?

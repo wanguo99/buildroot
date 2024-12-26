@@ -1,0 +1,25 @@
+config BR2_PACKAGE_PDM
+	bool "PDM (Peripheral Driver Module)"
+	depends on BR2_LINUX_KERNEL
+	help
+	  Enable this option to include the Peripheral Driver Module (PDM).
+	  PDM is a driver module that integrates with the Linux kernel.
+
+comment "PDM requires a Linux kernel to be built"
+	depends on !BR2_LINUX_KERNEL
+
+if BR2_PACKAGE_PDM
+
+config BR2_PACKAGE_PDM_GIT_REPO_URL
+	string "Git repository URL for PDM"
+	default "git@github.com:wanguo99/PDM.git" if BR2_PACKAGE_PDM
+	help
+	  Specify the Git repository URL from which to fetch the PDM source code.
+
+config BR2_PACKAGE_PDM_GIT_REPO_VERSION
+	string "Git repository version for PDM"
+	default "master" if BR2_PACKAGE_PDM
+	help
+	  Specify the Git repository version (commit hash, tag, or branch) to use for PDM.
+
+endif

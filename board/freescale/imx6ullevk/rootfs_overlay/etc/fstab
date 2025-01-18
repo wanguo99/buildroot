@@ -1,4 +1,0 @@
-# <file system> <mount point>   <type>  <options>       <dump>  <pass>
-/dev/root       /               auto    rw              0       1
-tmpfs           /root           tmpfs   defaults,noatime,nosuid,size=64M	0	0
-# tmpfs           /var            tmpfs   defaults,noatime,nosuid,size=64M	0	0

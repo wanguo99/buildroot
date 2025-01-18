@@ -12,7 +12,7 @@ if BR2_PACKAGE_PDM
 
 config BR2_PACKAGE_PDM_GIT_REPO_URL
 	string "Git repository URL for PDM"
-	default "git@github.com:wanguo99/PDM.git" if BR2_PACKAGE_PDM
+	default "git@github.com:wanguo99/pdm.git" if BR2_PACKAGE_PDM
 	help
 	  Specify the Git repository URL from which to fetch the PDM source code.
 

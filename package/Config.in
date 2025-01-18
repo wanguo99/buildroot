@@ -1,7 +1,8 @@
 menu "Target packages"
 
-menu "Perpherial Driver Module"
+menu "wanguo packages"
 	source "package/pdm/Config.in"
+	source "package/libpdm/Config.in"
 endmenu
 
 	source "package/busybox/Config.in"

@@ -1,0 +1,26 @@
+config BR2_PACKAGE_LIBPDM
+	bool "libpdm"
+	depends on BR2_PACKAGE_PDM
+	help
+	  Enable the PDM library.
+
+comment "libpdm requires pdm to be built"
+	depends on !BR2_PACKAGE_PDM
+
+if BR2_PACKAGE_LIBPDM
+
+config BR2_PACKAGE_LIBPDM_GIT_REPO_URL
+	string "Git repository URL for libpdm"
+	default "git@github.com:wanguo99/libpdm.git" if BR2_PACKAGE_LIBPDM
+	help
+	  Specify the Git repository URL from which to fetch the lib source code.
+
+config BR2_PACKAGE_LIBPDM_GIT_REPO_VERSION
+	string "Git repository version for libpdm"
+	default "master" if BR2_PACKAGE_LIBPDM
+	help
+	  
+	  Specify the Git repository version (commit hash, tag, or branch) to use for libpdm.
+
+endif
+

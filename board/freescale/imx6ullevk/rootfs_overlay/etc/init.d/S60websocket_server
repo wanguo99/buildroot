@@ -1,0 +1,52 @@
+#!/bin/sh
+
+LOGFILE="/var/log/websocket_server.log"
+
+#start() {
+#	printf "Starting websocket_server: "
+#	start-stop-daemon -S -q -m -b -p /var/run/websocket_server.pid \
+#		--exec /usr/bin/websocket_server -- >> $LOGFILE 2>&1
+#	[ $? = 0 ] && echo "OK" || echo "FAIL"
+#}
+
+#stop() {
+#	printf "Stopping websocket_server: "
+#	start-stop-daemon -K -q -p /var/run/websocket_server.pid
+#	[ $? = 0 ] && echo "OK" || echo "FAIL"
+#}
+
+start() {
+	sleep 5 # wait_for_network
+
+	printf "Starting websocket_server: "
+	/usr/bin/websocket_server & 2>&1
+	[ $? = 0 ] && echo "OK" || echo "FAIL"
+}
+
+stop() {
+	printf "Stopping websocket_server: "
+	killall websocket_server
+	[ $? = 0 ] && echo "OK" || echo "FAIL"
+}
+
+restart() {
+	stop
+	start
+}
+
+case "$1" in
+  start)
+	start
+	;;
+  stop)
+	stop
+	;;
+  restart|reload)
+	restart
+	;;
+  *)
+	echo "Usage: $0 {start|stop|restart}"
+	exit 1
+esac
+
+exit $?

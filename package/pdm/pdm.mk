@@ -4,30 +4,32 @@
 #
 ################################################################################
 
-PDM_VERSION = $(call qstrip,$(BR2_PACKAGE_PDM_GIT_REPO_VERSION))
-PDM_SITE = $(call qstrip,$(BR2_PACKAGE_PDM_GIT_REPO_URL))
-PDM_SITE_METHOD = git
-
+PDM_VERSION = $(call qstrip,$(BR2_PACKAGE_PDM_VERSION))
 # Specify the license and where to find the license file(s)
 PDM_LICENSE = GPL-2.0
 PDM_LICENSE_FILES = LICENSE
 
-# Assuming PDM is a kernel module based on the dependency in Config.in.
+# Compute PDM_SOURCE and PDM_SITE from the configuration
+ifeq ($(BR2_PACKAGE_PDM_CUSTOM_LOCAL_DIRECTORY),y)
+PDM_SITE = $(call qstrip,$(BR2_PACKAGE_PDM_CUSTOM_LOCAL_DIRECTORY_LOCATION))
+PDM_SITE_METHOD = local
+else ifeq ($(BR2_PACKAGE_PDM_CUSTOM_GIT),y)
+PDM_SITE = $(call qstrip,$(BR2_PACKAGE_PDM_CUSTOM_REPO_URL))
+PDM_SITE_METHOD = git
+else # default using git
+PDM_SITE = $(call qstrip,$(BR2_PACKAGE_PDM_CUSTOM_REPO_URL))
+PDM_SITE_METHOD = git
+endif
+
+ifeq ($(PDM_SITE),)
+$(error BR2_PACKAGE_PDM_VERSION: $(BR2_PACKAGE_PDM_VERSION))
+$(error PDM_SITE: $(PDM_SITE))
+$(error PDM_SITE_METHOD: $(PDM_SITE_METHOD))
+$(error No custom kernel source set. Check your BR2_PACKAGE_PDM_VERSION setting)
+endif
+
+# PDM_MAKE_OPTS = 
+
 $(eval $(kernel-module))
-
-# For any additional configuration or installation steps, add them here.
-# For example, if there are specific make options or install commands:
-# PDM_MAKE_OPTS = ...
-# PDM_INSTALL_TARGET_OPTS = ...
-
-# If PDM has dependencies on other packages, list them here:
-# PDM_DEPENDENCIES = some-other-package
-
-# Include this if you have patches to apply:
-# define PDM_APPLY_PATCHES
-#    cd $(@D); \
-#    $(APPLY_PATCHES) $(PDM_PKGDIR) $(PDM_VERSION)
-# endef
-# PDM_POST_EXTRACT_HOOKS += PDM_APPLY_PATCHES
 
 $(eval $(generic-package))

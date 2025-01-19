@@ -10,16 +10,47 @@ comment "PDM requires a Linux kernel to be built"
 
 if BR2_PACKAGE_PDM
 
-config BR2_PACKAGE_PDM_GIT_REPO_URL
-	string "Git repository URL for PDM"
-	default "git@github.com:wanguo99/pdm.git" if BR2_PACKAGE_PDM
-	help
-	  Specify the Git repository URL from which to fetch the PDM source code.
+choice
+	prompt "PDM version"
 
-config BR2_PACKAGE_PDM_GIT_REPO_VERSION
-	string "Git repository version for PDM"
-	default "master" if BR2_PACKAGE_PDM
+config BR2_PACKAGE_PDM_CUSTOM_LOCAL_DIRECTORY
+	bool "Custom local directory"
 	help
-	  Specify the Git repository version (commit hash, tag, or branch) to use for PDM.
+		build pdm from local directory
+
+config BR2_PACKAGE_PDM_CUSTOM_GIT
+	bool "Custom Git repository"
+	help
+		code from a Git repository
+
+config BR2_PACKAGE_PDM_CUSTOM_SVN
+	bool "Custom Subversion repository"
+	help
+		code from a Subversion repository
+
+endchoice
+
+if BR2_PACKAGE_PDM_CUSTOM_GIT || BR2_PACKAGE_PDM_CUSTOM_SVN
+
+config BR2_PACKAGE_PDM_CUSTOM_REPO_URL
+    string "URL of custom repository"
+
+config BR2_PACKAGE_PDM_CUSTOM_REPO_VERSION
+    string "Custom repository version"
+    help
+      Revision to use in the typical format used by
+      Git/Subversion E.G. a sha id, a tag, branch, ..
+
+endif
+
+config BR2_PACKAGE_PDM_VERSION
+    string
+	default "local" if BR2_PACKAGE_PDM_CUSTOM_LOCAL_DIRECTORY
+    default BR2_PACKAGE_PDM_CUSTOM_REPO_VERSION \
+        if BR2_PACKAGE_PDM_CUSTOM_GIT || BR2_PACKAGE_PDM_CUSTOM_SVN
+
+config BR2_PACKAGE_PDM_CUSTOM_LOCAL_DIRECTORY_LOCATION
+	string "URL of custom local directory"
+	depends on BR2_PACKAGE_PDM_CUSTOM_LOCAL_DIRECTORY
 
 endif

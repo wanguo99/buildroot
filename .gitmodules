@@ -1,0 +1,8 @@
+[submodule "submodules/pdm"]
+	path = submodules/pdm
+	url = git@github.com:wanguo99/pdm.git
+	branch = master
+[submodule "submodules/libpdm"]
+	path = submodules/libpdm
+	url = git@github.com:wanguo99/libpdm.git
+	branch = master

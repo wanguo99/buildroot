@@ -16,8 +16,7 @@ LOGFILE="/var/log/websocket_server.log"
 #}
 
 start() {
-	sleep 4 # wait_for_network
-
+	sleep 5 # wait_for_network
 	printf "Starting websocket_server: "
 	/usr/bin/websocket_server & 2>&1
 	[ $? = 0 ] && echo "OK" || echo "FAIL"

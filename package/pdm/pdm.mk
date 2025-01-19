@@ -22,10 +22,7 @@ PDM_SITE_METHOD = git
 endif
 
 ifeq ($(PDM_SITE),)
-$(error BR2_PACKAGE_PDM_VERSION: $(BR2_PACKAGE_PDM_VERSION))
-$(error PDM_SITE: $(PDM_SITE))
-$(error PDM_SITE_METHOD: $(PDM_SITE_METHOD))
-$(error No custom kernel source set. Check your BR2_PACKAGE_PDM_VERSION setting)
+$(error No custom source set. Check your BR2_PACKAGE_PDM_VERSION setting)
 endif
 
 # PDM_MAKE_OPTS = 

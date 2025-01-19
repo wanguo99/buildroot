@@ -11,7 +11,7 @@ comment "PDM requires a Linux kernel to be built"
 if BR2_PACKAGE_PDM
 
 choice
-	prompt "PDM version"
+	prompt "PDM driver version"
 
 config BR2_PACKAGE_PDM_CUSTOM_LOCAL_DIRECTORY
 	bool "Custom local directory"

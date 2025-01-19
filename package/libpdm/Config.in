@@ -11,7 +11,7 @@ comment "PDM requires pdm driver to be built"
 if BR2_PACKAGE_LIBPDM
 
 choice
-	prompt "PDM version"
+	prompt "PDM library version"
 
 config BR2_PACKAGE_LIBPDM_CUSTOM_LOCAL_DIRECTORY
 	bool "Custom local directory"

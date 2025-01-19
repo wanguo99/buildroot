@@ -22,10 +22,7 @@ LIBPDM_SITE_METHOD = git
 endif
 
 ifeq ($(LIBPDM_SITE),)
-$(error BR2_PACKAGE_LIBPDM_VERSION: $(BR2_PACKAGE_LIBPDM_VERSION))
-$(error LIBPDM_SITE: $(LIBPDM_SITE))
-$(error LIBPDM_SITE_METHOD: $(LIBPDM_SITE_METHOD))
-$(error No custom kernel source set. Check your BR2_PACKAGE_LIBPDM_VERSION setting)
+$(error No custom source set. Check your BR2_PACKAGE_LIBPDM_VERSION setting)
 endif
 
 $(eval $(cmake-package))

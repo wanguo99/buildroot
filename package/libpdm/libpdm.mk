@@ -25,4 +25,7 @@ ifeq ($(LIBPDM_SITE),)
 $(error No custom source set. Check your BR2_PACKAGE_LIBPDM_VERSION setting)
 endif
 
+# dependences
+LIBPDM_DEPENDENCIES = libwebsockets mosquitto
+
 $(eval $(cmake-package))

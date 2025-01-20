@@ -1,6 +1,8 @@
 config BR2_PACKAGE_LIBPDM
 	bool "PDM Library"
 	depends on BR2_PACKAGE_PDM
+	select BR2_PACKAGE_LIBWEBSOCKETS
+	select BR2_PACKAGE_MOSQUITTO
 	help
 	  Enable PDM Library.
 	  PDM is a driver module that integrates with the Linux kernel.

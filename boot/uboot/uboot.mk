@@ -34,6 +34,9 @@ UBOOT_SITE_METHOD = hg
 else ifeq ($(BR2_TARGET_UBOOT_CUSTOM_SVN),y)
 UBOOT_SITE = $(call qstrip,$(BR2_TARGET_UBOOT_CUSTOM_REPO_URL))
 UBOOT_SITE_METHOD = svn
+else ifeq ($(BR2_TARGET_UBOOT_CUSTOM_LOCAL_DIRECTORY),y)
+UBOOT_SITE = $(call qstrip,$(BR2_TARGET_UBOOT_CUSTOM_LOCAL_DIRECTORY_LOCATION))
+UBOOT_SITE_METHOD = local
 else
 # Handle stable official U-Boot versions
 UBOOT_SITE = https://ftp.denx.de/pub/u-boot

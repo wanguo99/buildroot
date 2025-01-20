@@ -6,3 +6,9 @@
 	path = submodules/libpdm
 	url = git@github.com:wanguo99/libpdm.git
 	branch = master
+[submodule "submodules/u-boot-v2024.10"]
+	path = submodules/u-boot-v2024.10
+	url = git@github.com:wanguo99/u-boot-v2024.10.git
+[submodule "submodules/linux-6.12"]
+	path = submodules/linux-6.12
+	url = git@github.com:wanguo99/linux-6.12.git

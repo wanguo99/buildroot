@@ -1,6 +1,6 @@
 #!/bin/sh
 
-LOGFILE="/var/log/websocket_server.log"
+LOGFILE="/var/log/ws_server.log"
 
 #start() {
 #	printf "Starting websocket_server: "
@@ -17,14 +17,14 @@ LOGFILE="/var/log/websocket_server.log"
 
 start() {
 	sleep 5 # wait_for_network
-	printf "Starting websocket_server: "
-	/usr/bin/websocket_server & 2>&1
+	printf "Starting WebSocket Server: "
+	/usr/bin/ws_server & 2>&1
 	[ $? = 0 ] && echo "OK" || echo "FAIL"
 }
 
 stop() {
-	printf "Stopping websocket_server: "
-	killall websocket_server
+	printf "Stopping WebSocket Server: "
+	killall ws_server
 	[ $? = 0 ] && echo "OK" || echo "FAIL"
 }
 

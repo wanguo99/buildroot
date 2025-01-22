@@ -1,6 +1,7 @@
 menu "Target packages"
 
 menu "wanguo packages"
+	source "package/lws_server/Config.in"
 	source "package/pdm/Config.in"
 	source "package/libpdm/Config.in"
 endmenu

@@ -1,0 +1,17 @@
+config BR2_PACKAGE_LWS_SERVER
+	bool "Libwebsockets Server"
+	select BR2_PACKAGE_LIBWEBSOCKETS
+	select BR2_PACKAGE_CJSON
+	help
+	  Enable Libwebsockets Server.
+
+if BR2_PACKAGE_LWS_SERVER
+
+config BR2_PACKAGE_LWS_SERVER_VERSION
+    string
+	default "local"
+
+config BR2_PACKAGE_LWS_SERVER_CUSTOM_LOCAL_DIRECTORY_LOCATION
+	string "URL of custom local directory"
+	default "$(TOPDIR)/package/lws_server/lws_server"
+endif

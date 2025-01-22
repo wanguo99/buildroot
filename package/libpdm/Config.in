@@ -7,7 +7,7 @@ config BR2_PACKAGE_LIBPDM
 	  Enable PDM Library.
 	  PDM is a driver module that integrates with the Linux kernel.
 
-comment "PDM requires pdm driver to be built"
+comment "PDM Library requires pdm driver to be built"
 	depends on !BR2_PACKAGE_PDM
 
 if BR2_PACKAGE_LIBPDM

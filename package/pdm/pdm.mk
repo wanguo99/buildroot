@@ -21,10 +21,6 @@ PDM_SITE = $(call qstrip,$(BR2_PACKAGE_PDM_CUSTOM_REPO_URL))
 PDM_SITE_METHOD = git
 endif
 
-ifeq ($(PDM_SITE),)
-$(error No custom source set. Check your BR2_PACKAGE_PDM_VERSION setting)
-endif
-
 # PDM_MAKE_OPTS = 
 
 $(eval $(kernel-module))

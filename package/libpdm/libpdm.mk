@@ -21,10 +21,6 @@ LIBPDM_SITE = $(call qstrip,$(BR2_PACKAGE_LIBPDM_CUSTOM_REPO_URL))
 LIBPDM_SITE_METHOD = git
 endif
 
-ifeq ($(LIBPDM_SITE),)
-$(error No custom source set. Check your BR2_PACKAGE_LIBPDM_VERSION setting)
-endif
-
 # dependences
 LIBPDM_DEPENDENCIES = libwebsockets mosquitto
 

@@ -4,6 +4,7 @@
 #include <unistd.h>
 #include <arpa/inet.h>
 #include <pthread.h>
+#include <signal.h>
 #include <libwebsockets.h>
 #include <openssl/ssl.h> // For TLS support
 #include <cjson/cJSON.h>
@@ -198,7 +199,7 @@ int main(void) {
     }
 
     lwsl_user("LWS Server Starting...\n");
-    while (n >= 0 && !interrrupt) {
+    while (n >= 0 && !interrupted) {
         n = lws_service(context, 1000);
     }
 

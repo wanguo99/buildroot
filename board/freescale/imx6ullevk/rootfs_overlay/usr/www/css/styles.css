@@ -1,0 +1,102 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #333333;
+    color: #b3b3b3;
+    padding: 20px;
+    margin: 0;
+}
+
+#container {
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* 水平居中 */
+}
+
+.header {
+    text-align: center; /* 标题居中 */
+    font-size: 1.5em;
+    margin-bottom: 40px; /* 增加标题与内容之间的间距 */
+    width: 100%; /* 确保标题占据整行宽度 */
+}
+
+.main-content {
+    display: grid;
+    grid-template-columns: 1.5fr 0.8fr; /* 左侧更宽，右侧较窄 */
+    gap: 40px; /* 增加各元素之间的间距 */
+    width: 100%;
+    max-width: 1200px; /* 设置最大宽度以避免过宽 */
+}
+
+.section {
+    border: 1px solid #555; /* 添加边框 */
+    padding: 10px; /* 减少内部间距 */
+    background-color: #444; /* 模块的背景颜色 */
+    border-radius: 8px; /* 圆角 */
+    margin-top: 0; /* 移除顶部外边距以确保对齐 */
+    margin-bottom: 20px; /* 减少底部外边距以增大模块间的间距 */
+}
+
+.left-column .section {
+    padding: 10px; /* 进一步减少左侧模块的内部间距 */
+    margin-bottom: 10px; /* 减少左侧模块的底部外边距 */
+}
+
+.output-pane {
+    overflow-y: scroll;
+    padding: 10px;
+    margin-bottom: 10px;
+    resize: both;
+    background-color: #555; /* output-pane 的背景颜色，比模块背景更深 */
+    color: #b3b3b3;
+    border: 1px solid #444;
+    text-align: left;
+    min-width: 200px;
+    height: 200px; /* Fixed height to ensure they are the same size */
+}
+
+input, select, button {
+    padding: 5px;
+    margin-bottom: 10px;
+    background-color: #4d4d4d;
+    color: #b3b3b3;
+    border: 1px solid #444;
+    display: inline-block;
+    transition: background-color 0.2s, transform 0.2s; /* 添加过渡效果 */
+}
+
+button {
+    cursor: pointer; /* 改变鼠标指针为手型 */
+}
+
+button:hover {
+    background-color: #666; /* 鼠标悬停时改变背景色 */
+}
+
+button:active {
+    background-color: #777; /* 按下按钮时改变背景色 */
+    transform: scale(0.98); /* 按钮按下时稍微缩小 */
+}
+
+.message, .log-entry {
+    margin: 5px 0;
+}
+
+.resize-handle {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 10px;
+    height: 10px;
+    background-color: #666;
+    cursor: se-resize;
+}
+
+.log-level-debug { background-color: #f0f0f0; color: #000; }
+.log-level-info { background-color: #d9edf7; color: #31708f; }
+.log-level-warn { background-color: #fcf8e3; color: #8a6d3b; }
+.log-level-error { background-color: #f2dede; color: #a94442; }
+
+.subheader {
+    font-size: 1.2em;
+    margin-bottom: 10px;
+}

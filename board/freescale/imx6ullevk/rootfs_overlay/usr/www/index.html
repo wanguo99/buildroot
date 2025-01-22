@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>WebSocket Client</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+<div id="container">
+    <!-- Header -->
+    <header class="header">
+        <h1>WebSocket Client</h1>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Left Column -->
+        <section class="left-column">
+            <!-- WebSocket Client Sections -->
+            <div class="section">
+                <h2 class="subheader">Messages Output:</h2>
+                <button id="clearMessagesButton">Clear Messages</button>
+                <div id="messages" class="output-pane"></div>
+            </div>
+
+            <!-- Log Output Section -->
+            <div class="section">
+                <h2 class="subheader">Log Output:</h2>
+                <button id="clearLogButton">Clear Log</button>
+                <div id="log-output" class="output-pane"></div>
+            </div>
+        </section>
+
+        <!-- Right Column -->
+        <section class="right-column">
+            <!-- Sent Message Test Section -->
+            <div class="section sent-message-test">
+                <h2 class="subheader">Sent Text Message Test:</h2>
+                <input type="text" id="textMessageInput" placeholder="Type a message..." />
+                <button id="sendTextButton">Send</button>
+            </div>
+
+            <!-- Request MQTT Configuration Test Section -->
+            <div class="section Request-mqtt-config-test">
+                <h2 class="subheader">Request MQTT Configuration Test:</h2>
+                <button id="requestMqttConfigButton">Request</button>
+            </div>
+
+            <!-- MQTT Publish Test Section -->
+            <div class="section">
+                <h2 class="subheader">MQTT Publish Test:</h2>
+                <select id="topicSelect">
+                    <option value="">Select a topic...</option>
+                    <option value="SWITCH">SWITCH</option>
+                    <option value="DIMMER">DIMMER</option>
+                </select>
+                <select id="indexSelect">
+                    <option value="">Select an index...</option>
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                </select>
+                <select id="stateSelect">
+                    <option value="">Select a state...</option>
+                    <option value="ON">ON</option>
+                    <option value="OFF">OFF</option>
+                </select>
+                <button id="publishButton">Publish</button>
+            </div>
+        </section>
+    </main>
+</div>
+
+<script type="module" src="./js/IndexMain.js"></script>
+</body>
+</html>

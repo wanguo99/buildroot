@@ -8,8 +8,8 @@
 #include <openssl/ssl.h> // For TLS support
 #include <cjson/cJSON.h>
 
-#define PORT 8080
 #define MQTT_CONFIGURATION_FILE "/etc/websocket/mqtt_conf.json"
+
 void get_mqtt_config_handler(struct lws *wsi)
 {
     FILE *file = fopen(MQTT_CONFIGURATION_FILE, "r");
@@ -148,26 +148,58 @@ static struct lws_protocols protocols[] = {
     { NULL, NULL, 0, 0 }
 };
 
+static const struct lws_http_mount mount = {
+	/* .mount_next */		        NULL,		/* linked-list "next" */
+	/* .mountpoint */		        "/",		/* mountpoint URL */
+	/* .origin */			        "/usr/www", /* serve from dir */
+	/* .def */			            "index.html",	/* default filename */
+	/* .protocol */			        NULL,
+	/* .cgienv */			        NULL,
+	/* .extra_mimetypes */	        NULL,
+	/* .interpret */		        NULL,
+	/* .cgi_timeout */		        0,
+	/* .cache_max_age */	        0,
+	/* .auth_mask */		        0,
+	/* .cache_reusable */		    0,
+	/* .cache_revalidate */		    0,
+	/* .cache_intermediaries */	    0,
+	/* .origin_protocol */		    LWSMPRO_FILE,	/* files in a dir */
+	/* .mountpoint_len */		    1,		/* char count */
+	/* .basic_auth_login_file */	NULL,
+};
+
+static int interrupted;
+
+void sigint_handler(int sig)
+{
+	interrupted = 1;
+}
+
 int main(void) {
     struct lws_context_creation_info info;
     struct lws_context *context;
+    int n = 0;
 
-    memset(&info, 0, sizeof(info));
-    info.port = PORT;
+	signal(SIGINT, sigint_handler);
+
+    lwsl_user("LWS HTTP Server: \nVisit http://10.10.0.221:8080\n");
+
+    memset(&info, 0, sizeof info);
+    info.port = 8080;
+    info.mounts = &mount;
     info.protocols = protocols;
-    info.gid = -1;
-    info.uid = -1;
+    info.error_document_404 = "/404.html";
     info.options = LWS_SERVER_OPTION_DO_SSL_GLOBAL_INIT; // Enable SSL global init
 
     context = lws_create_context(&info);
     if (context == NULL) {
-        fprintf(stderr, "lws_create_context failed\n");
-        return -1;
+        lwsl_err("lws init failed\n");
+        return 1;
     }
 
-    printf("Starting server...\n");
-    while (1) {
-        lws_service(context, 1000);
+    lwsl_user("LWS Server Starting...\n");
+    while (n >= 0 && !interrrupt) {
+        n = lws_service(context, 1000);
     }
 
     lws_context_destroy(context);

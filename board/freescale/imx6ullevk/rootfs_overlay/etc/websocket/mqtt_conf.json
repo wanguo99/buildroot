@@ -1,0 +1,17 @@
+[
+    {
+        "topic": "example/switch",
+        "payload": {
+            "index": [0, 1, 2, 3],
+            "state": ["ON", "OFF", "UNKNOWN"]
+        }
+    },
+    {
+        "topic": "example/dimmer",
+        "payload": {
+            "index": [0, 1, 2],
+            "state": ["ON", "OFF", "UNKNOWN"],
+            "level": [0, 1, 2, 3, 4, 5, 6]
+        }
+    }
+]

@@ -5,16 +5,19 @@
 #endif
 
 #include <string.h>
+#include <cjson/cJSON.h>
+
+
+#define LWS_MSG_TYPE_SIMPLE_TEXT 		"LWS_MSG_TYPE_SIMPLE_TEXT"
+#define LWS_MSG_TYPE_MQTT_PUBLISH_EVENT "LWS_MSG_TYPE_MQTT_PUBLISH_EVENT"
 
 /* one of these created for each message */
-
 struct msg {
 	void *payload; /* is malloc'd */
 	size_t len;
 };
 
 /* one of these is created for each client connecting to us */
-
 struct per_session_data__mqtt_test {
 	struct per_session_data__mqtt_test *pss_list;
 	struct lws *wsi;
@@ -24,7 +27,6 @@ struct per_session_data__mqtt_test {
 };
 
 /* one of these is created for each vhost our protocol is used with */
-
 struct per_vhost_data__mqtt_test {
 	struct lws_context *context;
 	struct lws_vhost *vhost;
@@ -35,19 +37,12 @@ struct per_vhost_data__mqtt_test {
 	struct lws_ring *ring; /* ringbuffer holding unsent messages */
 };
 
-static void
-cull_lagging_clients(struct per_vhost_data__mqtt_test *vhd)
+static void cull_lagging_clients(struct per_vhost_data__mqtt_test *vhd)
 {
 	uint32_t oldest_tail = lws_ring_get_oldest_tail(vhd->ring);
 	struct per_session_data__mqtt_test *old_pss = NULL;
 	int most = 0, before = (int)lws_ring_get_count_waiting_elements(vhd->ring,
 					&oldest_tail), m;
-
-	/*
-	 * At least one guy with the oldest tail has lagged too far, filling
-	 * the ringbuffer with stuff waiting for them, while new stuff is
-	 * coming in, and they must close, freeing up ringbuffer entries.
-	 */
 
 	lws_start_foreach_llp_safe(struct per_session_data__mqtt_test **,
 			      ppss, vhd->pss_list, pss_list) {
@@ -57,45 +52,15 @@ cull_lagging_clients(struct per_vhost_data__mqtt_test *vhd)
 
 			lwsl_user("Killing lagging client %p\n", (*ppss)->wsi);
 
-			lws_set_timeout((*ppss)->wsi, PENDING_TIMEOUT_LAGGING,
-					/*
-					 * we may kill the wsi we came in on,
-					 * so the actual close is deferred
-					 */
-					LWS_TO_KILL_ASYNC);
-
-			/*
-			 * We might try to write something before we get a
-			 * chance to close.  But this pss is now detached
-			 * from the ring buffer.  Mark this pss as culled so we
-			 * don't try to do anything more with it.
-			 */
+			lws_set_timeout((*ppss)->wsi, PENDING_TIMEOUT_LAGGING, LWS_TO_KILL_ASYNC);
 
 			(*ppss)->culled = 1;
-
-			/*
-			 * Because we can't kill it synchronously, but we
-			 * know it's closing momentarily and don't want its
-			 * participation any more, remove its pss from the
-			 * vhd pss list early.  (This is safe to repeat
-			 * uselessly later in the close flow).
-			 *
-			 * Notice this changes *ppss!
-			 */
-
 			lws_ll_fwd_remove(struct per_session_data__mqtt_test,
 					  pss_list, (*ppss), vhd->pss_list);
-
-			/* use the changed *ppss so we won't skip anything */
 
 			continue;
 
 		} else {
-			/*
-			 * so this guy is a survivor of the cull.  Let's track
-			 * what is the largest number of pending ring elements
-			 * for any survivor.
-			 */
 			m = (int)lws_ring_get_count_waiting_elements(vhd->ring,
 							&((*ppss)->tail));
 			if (m > most)
@@ -104,14 +69,8 @@ cull_lagging_clients(struct per_vhost_data__mqtt_test *vhd)
 
 	} lws_end_foreach_llp_safe(ppss);
 
-	/* it would mean we lost track of oldest... but Coverity insists */
 	if (!old_pss)
 		return;
-
-	/*
-	 * Let's recover (ie, free up) all the ring slots between the
-	 * original oldest's last one and the "worst" survivor.
-	 */
 
 	lws_ring_consume_and_update_oldest_tail(vhd->ring,
 		struct per_session_data__mqtt_test, &old_pss->tail, (size_t)(before - most),
@@ -120,20 +79,98 @@ cull_lagging_clients(struct per_vhost_data__mqtt_test *vhd)
 	lwsl_user("%s: shrunk ring from %d to %d\n", __func__, before, most);
 }
 
-/* destroys the message when everyone has had a copy of it */
-
-static void
-__mqtt_test_destroy_message(void *_msg)
+static void __mqtt_test_destroy_message(void *_msg)
 {
 	struct msg *msg = _msg;
-
-	free(msg->payload);
-	msg->payload = NULL;
-	msg->len = 0;
+	if (msg->payload) {
+		free(msg->payload);
+		msg->payload = NULL;
+		msg->len = 0;
+	}
 }
 
-static int
-callback_mqtt_test(struct lws *wsi, enum lws_callback_reasons reason,
+static int simple_text_handler(cJSON *data)
+{
+    cJSON *message = cJSON_GetObjectItem(data, "message");
+
+    if (cJSON_IsString(message)) {
+        printf("SIMPLE_TEXT: message=%s\n", message->valuestring);
+    } else {
+        fprintf(stderr, "Error: Invalid SIMPLE_TEXT data\n");
+    }
+
+    return 0;
+}
+
+
+static int mqtt_publish_event_handler(cJSON *data)
+{
+    cJSON *topic = cJSON_GetObjectItem(data, "topic");
+    cJSON *index = cJSON_GetObjectItem(data, "index");
+    cJSON *state = cJSON_GetObjectItem(data, "state");
+
+    if (cJSON_IsString(topic) && cJSON_IsNumber(index) && cJSON_IsString(state)) {
+        printf("MQTT_PUBLISH_EVENT: topic=%s, index=%d, state=%s\n",
+                topic->valuestring, index->valueint, state->valuestring);
+    } else {
+        fprintf(stderr, "Error: Invalid MQTT_PUBLISH_EVENT data\n");
+    }
+    return 0;
+}
+
+static int ws_callback_receive_parse(struct msg *amsg, struct msg *rsp_msg)
+{
+	cJSON *cJsonRoot;
+	cJSON *cJsonType;
+	char *cJsonString;
+	cJSON *cJsonData;
+	int status;
+
+	cJsonRoot = cJSON_Parse((const char *)amsg->payload + LWS_PRE);
+	if (!cJsonRoot) {
+		fprintf(stderr, "Error parsing JSON\n");
+		return 1;
+	}
+
+	cJsonType = cJSON_GetObjectItem(cJsonRoot, "type");
+	if (!cJSON_IsString(cJsonType)) {
+		fprintf(stderr, "Error: type is not a string\n");
+		cJSON_Delete(cJsonRoot);
+		return 1;
+	}
+
+	cJsonData = cJSON_GetObjectItem(cJsonRoot, "data");
+	if (!cJSON_IsObject(cJsonData)) {
+		fprintf(stderr, "Error: Invalid data\n");
+		cJSON_Delete(cJsonRoot);
+		return 1;
+	}
+
+	cJsonString = cJSON_Print(cJsonRoot);
+	if (cJsonString) {
+		printf("\n-----------------------------\n");
+		printf("Received JSON Data: \n");
+		printf("-----------------------------\n");
+		printf("%s\n", cJsonString);
+		printf("-----------------------------\n");
+		free(cJsonString);
+	}
+
+	if (strcmp(cJsonType->valuestring, LWS_MSG_TYPE_MQTT_PUBLISH_EVENT) == 0) {
+		status = mqtt_publish_event_handler(cJsonData);
+	} else if (strcmp(cJsonType->valuestring, LWS_MSG_TYPE_SIMPLE_TEXT) == 0) {
+		status = simple_text_handler(cJsonData);
+	} else {
+		fprintf(stderr, "Error: Unknown type %s\n", cJsonType->valuestring);
+		status = 1;
+	}
+
+	cJSON_Delete(cJsonRoot);
+	return status;
+}
+
+
+static int callback_mqtt_test(struct lws *wsi, enum lws_callback_reasons reason,
 			void *user, void *in, size_t len)
 {
 	struct per_session_data__mqtt_test *pss =
@@ -144,11 +181,11 @@ callback_mqtt_test(struct lws *wsi, enum lws_callback_reasons reason,
 					lws_get_protocol(wsi));
 	const struct msg *pmsg;
 	struct msg amsg;
-	int n, m;
+	struct msg rsp_msg;
+	int n, m, status;
 
 	switch (reason) {
 	case LWS_CALLBACK_PROTOCOL_INIT:
-		lwsl_user("LWS_CALLBACK_PROTOCOL_INIT: wsi %p\n", wsi);
 		vhd = lws_protocol_vh_priv_zalloc(lws_get_vhost(wsi),
 				lws_get_protocol(wsi),
 				sizeof(struct per_vhost_data__mqtt_test));
@@ -163,13 +200,10 @@ callback_mqtt_test(struct lws *wsi, enum lws_callback_reasons reason,
 		break;
 
 	case LWS_CALLBACK_PROTOCOL_DESTROY:
-		lwsl_user("LWS_CALLBACK_PROTOCOL_DESTROY: wsi %p\n", wsi);
 		lws_ring_destroy(vhd->ring);
 		break;
 
 	case LWS_CALLBACK_ESTABLISHED:
-		/* add ourselves to the list of live pss held in the vhd */
-		lwsl_user("LWS_CALLBACK_ESTABLISHED: wsi %p\n", wsi);
 		lws_ll_fwd_insert(pss, pss_list, vhd->pss_list);
 		pss->tail = lws_ring_get_oldest_tail(vhd->ring);
 		pss->wsi = wsi;
@@ -215,42 +249,46 @@ callback_mqtt_test(struct lws *wsi, enum lws_callback_reasons reason,
 		break;
 
 	case LWS_CALLBACK_RECEIVE:
-		lwsl_user("LWS_CALLBACK_RECEIVE: wsi %p\n", wsi);
 		n = (int)lws_ring_get_count_free_elements(vhd->ring);
 		if (!n) {
-			/* forcibly make space */
 			cull_lagging_clients(vhd);
 			n = (int)lws_ring_get_count_free_elements(vhd->ring);
 		}
 		if (!n)
 			break;
 
-		lwsl_user("LWS_CALLBACK_RECEIVE: free space %d\n", n);
-
 		amsg.len = len;
-		/* notice we over-allocate by LWS_PRE... */
 		amsg.payload = malloc(LWS_PRE + len);
 		if (!amsg.payload) {
 			lwsl_user("OOM: dropping\n");
 			break;
 		}
 
-		/* ...and we copy the payload in at +LWS_PRE */
 		memcpy((char *)amsg.payload + LWS_PRE, in, len);
-		if (!lws_ring_insert(vhd->ring, &amsg, 1)) {
-			__mqtt_test_destroy_message(&amsg);
-			lwsl_user("dropping!\n");
+		memset(&rsp_msg, 0, sizeof(rsp_msg));
+		status = ws_callback_receive_parse(&amsg, &rsp_msg);
+		if (status < 0) {
+			lwsl_user("Error parsing received message\n");
+			__mqtt_test_destroy_message(&rsp_msg);
 			break;
 		}
+		__mqtt_test_destroy_message(&rsp_msg);
 
-		/*
-		 * let everybody know we want to write something on them
-		 * as soon as they are ready
-		 */
-		lws_start_foreach_llp(struct per_session_data__mqtt_test **,
+		lwsl_user("rsp_msg.len = %d\n", rsp_msg.len);
+		if (rsp_msg.len != 0) {
+			lwsl_user("lws_ring_insert\n");
+			if (!lws_ring_insert(vhd->ring, &rsp_msg, 1)) {
+				__mqtt_test_destroy_message(&rsp_msg);
+				lwsl_user("dropping!\n");
+				break;
+			}
+			lwsl_user("lws_ring_insert done\n");
+			lws_start_foreach_llp(struct per_session_data__mqtt_test **,
 				      ppss, vhd->pss_list) {
-			lws_callback_on_writable((*ppss)->wsi);
-		} lws_end_foreach_llp(ppss, pss_list);
+				lws_callback_on_writable((*ppss)->wsi);
+			} lws_end_foreach_llp(ppss, pss_list);
+		}
+
 		break;
 
 	default:

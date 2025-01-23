@@ -89,7 +89,7 @@ async function sendTextMessage() {
     if (textMessage) {
         const data = { message: textMessage };
         try {
-            await handleSendMessage("SIMPLE_TEXT", data, 'sendTextButton');
+            await handleSendMessage("LWS_MSG_TYPE_SIMPLE_TEXT", data, 'sendTextButton');
             document.getElementById('textMessageInput').value = '';
             document.getElementById('textMessageInput').focus();
         } catch (error) {
@@ -115,14 +115,14 @@ async function publishMqttEvent() {
     }
 
     const data = { topic, index, state };
-    await handleSendMessage('MQTT_PUBLISH_EVENT', data, 'publishButton');
+    await handleSendMessage('LWS_MSG_TYPE_MQTT_PUBLISH_EVENT', data, 'publishButton');
 }
 
 async function requestMqttConfig() {
     try {
         logger.info("Requesting MQTT Configuration...");
         const data = {};
-        await wsManager.sendMessage("GET_MQTT_CONFIG", data, 'requestMqttConfigButton');
+        await wsManager.sendMessage("LWS_MSG_TYPE_GET_MQTT_CONFIG", data, 'requestMqttConfigButton');
     } catch (error) {
         logger.error(`Failed to send GET_MQTT_CONFIG message: ${error.message}`);
         appendMessage(`Failed to send GET_MQTT_CONFIG message: ${error.message}`, 'error');

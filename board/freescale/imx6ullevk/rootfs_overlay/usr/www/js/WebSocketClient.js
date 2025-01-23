@@ -1,17 +1,16 @@
 import { Logger } from './Logger.js';
 
+
 class WebSocketClient {
-    constructor(wsUri, options = {}) {
+    constructor(wsUri, protocol, options = {}) {
         this.wsUri = wsUri;
+        this.protocol = protocol;
         this.reconnectInterval = options.reconnectInterval || 30000; // Default to 30 seconds
         this.websocket = null;
         this.messageCallbacks = [];
         this.messageQueue = [];
         this.logger = new Logger('log-output');
         this.isConnected = false;
-
-        // Attempt to connect immediately upon instantiation
-        this.connect();
     }
 
     connect() {
@@ -21,7 +20,7 @@ class WebSocketClient {
         }
 
         return new Promise((resolve, reject) => {
-            this.websocket = new WebSocket(this.wsUri, 'WEBSOCKET_SIMPLE_PROTOCOL');
+            this.websocket = new WebSocket(this.wsUri, this.protocol);
 
             this.websocket.onopen = () => {
                 this.isConnected = true;

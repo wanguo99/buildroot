@@ -9,6 +9,7 @@
 
 
 #define LWS_MSG_TYPE_SIMPLE_TEXT 		"LWS_MSG_TYPE_SIMPLE_TEXT"
+#define LWS_MSG_TYPE_MQTT_GET_CONFIG 	"LWS_MSG_TYPE_MQTT_GET_CONFIG"
 #define LWS_MSG_TYPE_MQTT_PUBLISH_EVENT "LWS_MSG_TYPE_MQTT_PUBLISH_EVENT"
 
 /* one of these created for each message */
@@ -89,7 +90,7 @@ static void __mqtt_test_destroy_message(void *_msg)
 	}
 }
 
-static int simple_text_handler(cJSON *data)
+static int lws_msg_handler_simple_text(cJSON *data)
 {
     cJSON *message = cJSON_GetObjectItem(data, "message");
 
@@ -102,8 +103,20 @@ static int simple_text_handler(cJSON *data)
     return 0;
 }
 
+static int lws_msg_handler_mqtt_get_config(cJSON *data)
+{
+    cJSON *message = cJSON_GetObjectItem(data, "message");
 
-static int mqtt_publish_event_handler(cJSON *data)
+    if (cJSON_IsString(message)) {
+        printf("SIMPLE_TEXT: message=%s\n", message->valuestring);
+    } else {
+        fprintf(stderr, "Error: Invalid SIMPLE_TEXT data\n");
+    }
+
+    return 0;
+}
+
+static int lws_msg_handler_mqtt_publish_event(cJSON *data)
 {
     cJSON *topic = cJSON_GetObjectItem(data, "topic");
     cJSON *index = cJSON_GetObjectItem(data, "index");
@@ -156,10 +169,12 @@ static int ws_callback_receive_parse(struct msg *amsg, struct msg *rsp_msg)
 		free(cJsonString);
 	}
 
-	if (strcmp(cJsonType->valuestring, LWS_MSG_TYPE_MQTT_PUBLISH_EVENT) == 0) {
-		status = mqtt_publish_event_handler(cJsonData);
-	} else if (strcmp(cJsonType->valuestring, LWS_MSG_TYPE_SIMPLE_TEXT) == 0) {
-		status = simple_text_handler(cJsonData);
+	if (strcmp(cJsonType->valuestring, LWS_MSG_TYPE_SIMPLE_TEXT) == 0) {
+		status = lws_msg_handler_simple_text(cJsonData);
+	} else if (strcmp(cJsonType->valuestring, LWS_MSG_TYPE_MQTT_GET_CONFIG) == 0) {
+		status = lws_msg_handler_mqtt_get_config(cJsonData);
+	} else if (strcmp(cJsonType->valuestring, LWS_MSG_TYPE_MQTT_PUBLISH_EVENT) == 0) {
+		status = lws_msg_handler_mqtt_publish_event(cJsonData);
 	} else {
 		fprintf(stderr, "Error: Unknown type %s\n", cJsonType->valuestring);
 		status = 1;

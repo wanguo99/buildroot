@@ -122,10 +122,10 @@ async function requestMqttConfig() {
     try {
         logger.info("Requesting MQTT Configuration...");
         const data = {};
-        await wsManager.sendMessage("LWS_MSG_TYPE_GET_MQTT_CONFIG", data, 'requestMqttConfigButton');
+        await wsManager.sendMessage("LWS_MSG_TYPE_MQTT_GET_CONFIG", data, 'requestMqttConfigButton');
     } catch (error) {
-        logger.error(`Failed to send GET_MQTT_CONFIG message: ${error.message}`);
-        appendMessage(`Failed to send GET_MQTT_CONFIG message: ${error.message}`, 'error');
+        logger.error(`Failed to send MQTT_GET_CONFIG message: ${error.message}`);
+        appendMessage(`Failed to send MQTT_GET_CONFIG message: ${error.message}`, 'error');
     }
 }
 

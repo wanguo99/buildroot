@@ -5,7 +5,7 @@
 #define LWS_PLUGIN_STATIC
 #include "protocol_lws_mqtt_test.c"
 
-#define LWS_SERVER_PORT 8000
+#define LWS_SERVER_PORT 8080
 
 static struct lws_protocols protocols[] = {
 	{ "http", lws_callback_http_dummy, 0, 0, 0, NULL, 0 },

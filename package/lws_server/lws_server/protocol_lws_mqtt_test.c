@@ -7,6 +7,8 @@
 #include <string.h>
 #include <cjson/cJSON.h>
 
+#define MQTT_CONFIGURATION_FILE "/etc/websocket/mqtt_conf.json"
+
 
 #define LWS_MSG_TYPE_SIMPLE_TEXT 		"LWS_MSG_TYPE_SIMPLE_TEXT"
 #define LWS_MSG_TYPE_MQTT_GET_CONFIG 	"LWS_MSG_TYPE_MQTT_GET_CONFIG"
@@ -103,17 +105,62 @@ static int lws_msg_handler_simple_text(cJSON *data)
     return 0;
 }
 
-static int lws_msg_handler_mqtt_get_config(cJSON *data)
+static int lws_msg_handler_mqtt_get_config(cJSON *data, struct msg *rsp_msg)
 {
-    cJSON *message = cJSON_GetObjectItem(data, "message");
+	FILE *file;
+	long length;
+	char *file_data;
+	size_t read_length;
+	int ret = 0;
 
-    if (cJSON_IsString(message)) {
-        printf("SIMPLE_TEXT: message=%s\n", message->valuestring);
-    } else {
-        fprintf(stderr, "Error: Invalid SIMPLE_TEXT data\n");
-    }
+	file = fopen(MQTT_CONFIGURATION_FILE, "r");
+	if (!file) {
+		fprintf(stderr, "Error opening file: %s\n", MQTT_CONFIGURATION_FILE);
+		ret = 1;
+		goto cleanup;
+	}
 
-    return 0;
+	fseek(file, 0, SEEK_END);
+	length = ftell(file);
+	fseek(file, 0, SEEK_SET);
+
+	file_data = (char *)malloc(length + 1);
+	if (!file_data) {
+		fprintf(stderr, "Memory allocation error\n");
+		ret = 1;
+		goto cleanup_file;
+	}
+
+	read_length = fread(file_data, 1, length, file);
+	file_data[read_length] = '\0';
+
+	if (read_length != length) {
+		fprintf(stderr, "Error reading file: %s\n", MQTT_CONFIGURATION_FILE);
+		ret = 1;
+		goto cleanup_data;
+	}
+
+	printf("\n-----------------------------\n");
+	printf("Read File JSON Data: \n");
+	printf("-----------------------------\n");
+	printf("%s\n", file_data);
+
+	rsp_msg->payload = malloc(LWS_PRE + read_length);
+	if (!rsp_msg->payload) {
+		lwsl_user("OOM: dropping\n");
+		ret = 1;
+		goto cleanup_data;
+	}
+
+	memcpy((char *)rsp_msg->payload + LWS_PRE, file_data, read_length);
+	rsp_msg->len = read_length;
+
+cleanup_data:
+	free(file_data);
+cleanup_file:
+	fclose(file);
+cleanup:
+	return ret;
 }
 
 static int lws_msg_handler_mqtt_publish_event(cJSON *data)
@@ -172,7 +219,7 @@ static int ws_callback_receive_parse(struct msg *amsg, struct msg *rsp_msg)
 	if (strcmp(cJsonType->valuestring, LWS_MSG_TYPE_SIMPLE_TEXT) == 0) {
 		status = lws_msg_handler_simple_text(cJsonData);
 	} else if (strcmp(cJsonType->valuestring, LWS_MSG_TYPE_MQTT_GET_CONFIG) == 0) {
-		status = lws_msg_handler_mqtt_get_config(cJsonData);
+		status = lws_msg_handler_mqtt_get_config(cJsonData, rsp_msg);
 	} else if (strcmp(cJsonType->valuestring, LWS_MSG_TYPE_MQTT_PUBLISH_EVENT) == 0) {
 		status = lws_msg_handler_mqtt_publish_event(cJsonData);
 	} else {

@@ -44,7 +44,7 @@ async function initializeWebSocket() {
             wsManager.onMessage = async (message) => {
                 try {
                     const parsedMessage = JSON.parse(message);
-                    if (parsedMessage.type === 'MQTT_GET_CONFIG_RESPONSE') {
+                    if (parsedMessage.type === 'LWS_MSG_TYPE_MQTT_GET_CONFIG') {
                         logger.info("MQTT configuration received successfully.");
                         const config = parsedMessage.payload;
                         console.log("Received MQTT config:", config);

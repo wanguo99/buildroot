@@ -94,30 +94,21 @@ static void __mqtt_test_destroy_message(void *_msg)
 
 static int __mqtt_test_create_msg(const char *content, size_t content_len, struct msg *new_msg)
 {
-	lwsl_user("content = %s\n", content);
-	lwsl_user("content_len = %d\n", content_len);
-	lwsl_user("new_msg = %p\n", new_msg);
-
 	if (!new_msg || !content || content_len == 0) {
 		lwsl_user("Error: Invalid parameters for rsp_msg initialization\n");
 		return -1;
 	}
 
-	memset(&new_msg, 0, sizeof(new_msg));
+	memset(new_msg, 0, sizeof(new_msg));
 	new_msg->len = content_len;
-	lwsl_user("new_msg->len = %d\n", new_msg->len);
-
 	new_msg->payload = malloc(LWS_PRE + content_len);
 	if (!new_msg->payload) {
 		lwsl_user("OOM: dropping\n");
 		return -1;
 	}
-	lwsl_user("new_msg->payload = %p\n", new_msg->payload);
 
 	memset((char *)new_msg->payload + LWS_PRE, 0, content_len);
 	memcpy((char *)new_msg->payload + LWS_PRE, content, content_len);
-	lwsl_user("new_msg->payload = %s\n", (char *)new_msg->payload + LWS_PRE);
-
 	return 0;
 }
 
@@ -271,9 +262,6 @@ static int ws_callback_receive_parse(void *recv_data, size_t len, struct msg *rs
 		status = 1;
 	}
 
-	lwsl_user("rsp_msg.len = %d\n", rsp_msg->len);
-	lwsl_user("rsp_msg.payload = %d\n", rsp_msg->payload);
-
 	cJSON_Delete(cJsonRoot);
 	return status;
 }
@@ -333,6 +321,9 @@ static int callback_mqtt_test(struct lws *wsi, enum lws_callback_reasons reason,
 		if (!pmsg)
 			break;
 
+		lwsl_user("len %d\n", (int)pmsg->len);
+		lwsl_user("payload: %s\n", (char *)pmsg->payload + LWS_PRE);
+
 		/* notice we allowed for LWS_PRE in the payload already */
 		m = lws_write(wsi, ((unsigned char *)pmsg->payload) +
 			      LWS_PRE, pmsg->len, LWS_WRITE_TEXT);
@@ -372,15 +363,12 @@ static int callback_mqtt_test(struct lws *wsi, enum lws_callback_reasons reason,
 			break;
 		}
 
-		lwsl_user("rsp_msg.len = %d\n", rsp_msg.len);
 		if (rsp_msg.len != 0) {
-			lwsl_user("lws_ring_insert\n");
 			if (!lws_ring_insert(vhd->ring, &rsp_msg, 1)) {
 				__mqtt_test_destroy_message(&rsp_msg);
 				lwsl_user("dropping!\n");
 				break;
 			}
-			lwsl_user("lws_ring_insert done\n");
 			lws_start_foreach_llp(struct per_session_data__mqtt_test **,
 				      ppss, vhd->pss_list) {
 				lws_callback_on_writable((*ppss)->wsi);

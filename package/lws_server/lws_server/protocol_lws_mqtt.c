@@ -14,6 +14,52 @@
 #define LWS_MSG_TYPE_MQTT_GET_CONFIG 	"LWS_MSG_TYPE_MQTT_GET_CONFIG"
 #define LWS_MSG_TYPE_MQTT_PUBLISH_EVENT "LWS_MSG_TYPE_MQTT_PUBLISH_EVENT"
 
+enum MqttPayloadValType {
+	MQTT_PAYLOAD_VAL_TYPE_INT,
+	MQTT_PAYLOAD_VAL_TYPE_STRING,
+};
+
+struct mqtt_payload {
+	char name[32];
+	enum MqttPayloadValType type;
+	void *values;
+	size_t value_count;
+};
+
+struct mqtt_topic {
+	char topic[32];
+	struct mqtt_payload *payloads;
+	size_t payload_count;
+};
+
+
+struct mqtt_payload switch_payload = {
+	.name = "state",
+	.type = MQTT_PAYLOAD_VAL_TYPE_INT,
+	.values = (int[]){0, 1},
+	.value_count = 2
+};
+
+struct mqtt_payload dimmer_payload = {
+	.name = "level",
+	.type = MQTT_PAYLOAD_VAL_TYPE_INT,
+	.values = (int[]){0, 1, 2, 3, 4},
+	.value_count = 5
+};
+
+struct mqtt_topic switch_topic = {
+	.topic = "switch",
+	.payloads = &switch_payload,
+	.payload_count = 1
+};
+
+struct mqtt_topic dimmer_topic = {
+	.topic = "dimmer",
+	.payloads = &dimmer_payload,
+	.payload_count = 1
+};
+
+
 /* one of these created for each message */
 struct msg {
 	void *payload; /* is malloc'd */
@@ -21,8 +67,8 @@ struct msg {
 };
 
 /* one of these is created for each client connecting to us */
-struct per_session_data__mqtt_test {
-	struct per_session_data__mqtt_test *pss_list;
+struct per_session_data__mqtt {
+	struct per_session_data__mqtt *pss_list;
 	struct lws *wsi;
 	uint32_t tail;
 
@@ -30,24 +76,24 @@ struct per_session_data__mqtt_test {
 };
 
 /* one of these is created for each vhost our protocol is used with */
-struct per_vhost_data__mqtt_test {
+struct per_vhost_data__mqtt {
 	struct lws_context *context;
 	struct lws_vhost *vhost;
 	const struct lws_protocols *protocol;
 
-	struct per_session_data__mqtt_test *pss_list; /* linked-list of live pss*/
+	struct per_session_data__mqtt *pss_list; /* linked-list of live pss*/
 
 	struct lws_ring *ring; /* ringbuffer holding unsent messages */
 };
 
-static void cull_lagging_clients(struct per_vhost_data__mqtt_test *vhd)
+static void cull_lagging_clients(struct per_vhost_data__mqtt *vhd)
 {
 	uint32_t oldest_tail = lws_ring_get_oldest_tail(vhd->ring);
-	struct per_session_data__mqtt_test *old_pss = NULL;
+	struct per_session_data__mqtt *old_pss = NULL;
 	int most = 0, before = (int)lws_ring_get_count_waiting_elements(vhd->ring,
 					&oldest_tail), m;
 
-	lws_start_foreach_llp_safe(struct per_session_data__mqtt_test **,
+	lws_start_foreach_llp_safe(struct per_session_data__mqtt **,
 			      ppss, vhd->pss_list, pss_list) {
 
 		if ((*ppss)->tail == oldest_tail) {
@@ -58,7 +104,7 @@ static void cull_lagging_clients(struct per_vhost_data__mqtt_test *vhd)
 			lws_set_timeout((*ppss)->wsi, PENDING_TIMEOUT_LAGGING, LWS_TO_KILL_ASYNC);
 
 			(*ppss)->culled = 1;
-			lws_ll_fwd_remove(struct per_session_data__mqtt_test,
+			lws_ll_fwd_remove(struct per_session_data__mqtt,
 					  pss_list, (*ppss), vhd->pss_list);
 
 			continue;
@@ -76,13 +122,13 @@ static void cull_lagging_clients(struct per_vhost_data__mqtt_test *vhd)
 		return;
 
 	lws_ring_consume_and_update_oldest_tail(vhd->ring,
-		struct per_session_data__mqtt_test, &old_pss->tail, (size_t)(before - most),
+		struct per_session_data__mqtt, &old_pss->tail, (size_t)(before - most),
 		vhd->pss_list, tail, pss_list);
 
 	lwsl_user("%s: shrunk ring from %d to %d\n", __func__, before, most);
 }
 
-static void __mqtt_test_destroy_message(void *_msg)
+static void __mqtt_destroy_message(void *_msg)
 {
 	struct msg *msg = _msg;
 	if (msg->payload) {
@@ -91,7 +137,7 @@ static void __mqtt_test_destroy_message(void *_msg)
 		msg->len = 0;
 	}
 }
-static int __mqtt_test_create_msg(const char *type, const char *data, struct msg *new_msg)
+static int __mqtt_create_msg(const char *type, const char *data, struct msg *new_msg)
 {
 	cJSON *root;
 	char *json_str;
@@ -179,7 +225,7 @@ static int lws_msg_handler_mqtt_get_config(struct msg *rsp_msg)
 	lwsl_user("-----------------------------\n");
 	lwsl_user("%s\n", data);
 
-	status = __mqtt_test_create_msg(LWS_MSG_TYPE_MQTT_GET_CONFIG, data, rsp_msg);
+	status = __mqtt_create_msg(LWS_MSG_TYPE_MQTT_GET_CONFIG, data, rsp_msg);
 	if (status) {
 		lwsl_user("Error creating response message\n");
 		goto cleanup_data;
@@ -207,7 +253,7 @@ static int lws_msg_handler_mqtt_publish_event(cJSON *data, struct msg *rsp_msg)
         lwsl_user("Error: Invalid MQTT_PUBLISH_EVENT data\n");
     }
 
-	if (__mqtt_test_create_msg(LWS_MSG_TYPE_MQTT_PUBLISH_EVENT, reply, rsp_msg)) {
+	if (__mqtt_create_msg(LWS_MSG_TYPE_MQTT_PUBLISH_EVENT, reply, rsp_msg)) {
 		lwsl_user("Error creating response message\n");
 		return -1;
 	}
@@ -227,7 +273,7 @@ static int lws_msg_handler_simple_text(cJSON *data, struct msg *rsp_msg)
         lwsl_user("Error: Invalid SIMPLE_TEXT data\n");
     }
 
-	if (__mqtt_test_create_msg(LWS_MSG_TYPE_SIMPLE_TEXT, message->valuestring, rsp_msg)) {
+	if (__mqtt_create_msg(LWS_MSG_TYPE_SIMPLE_TEXT, message->valuestring, rsp_msg)) {
 		lwsl_user("Error creating response message\n");
 		return -1;
 	}
@@ -294,13 +340,13 @@ static int ws_callback_receive_parse(void *recv_data, size_t len, struct msg *rs
 }
 
 
-static int callback_mqtt_test(struct lws *wsi, enum lws_callback_reasons reason,
+static int callback_mqtt(struct lws *wsi, enum lws_callback_reasons reason,
 			void *user, void *in, size_t len)
 {
-	struct per_session_data__mqtt_test *pss =
-			(struct per_session_data__mqtt_test *)user;
-	struct per_vhost_data__mqtt_test *vhd =
-			(struct per_vhost_data__mqtt_test *)
+	struct per_session_data__mqtt *pss =
+			(struct per_session_data__mqtt *)user;
+	struct per_vhost_data__mqtt *vhd =
+			(struct per_vhost_data__mqtt *)
 			lws_protocol_vh_priv_get(lws_get_vhost(wsi),
 					lws_get_protocol(wsi));
 	const struct msg *pmsg;
@@ -312,13 +358,13 @@ static int callback_mqtt_test(struct lws *wsi, enum lws_callback_reasons reason,
 	case LWS_CALLBACK_PROTOCOL_INIT:
 		vhd = lws_protocol_vh_priv_zalloc(lws_get_vhost(wsi),
 				lws_get_protocol(wsi),
-				sizeof(struct per_vhost_data__mqtt_test));
+				sizeof(struct per_vhost_data__mqtt));
 		vhd->context = lws_get_context(wsi);
 		vhd->protocol = lws_get_protocol(wsi);
 		vhd->vhost = lws_get_vhost(wsi);
 
 		vhd->ring = lws_ring_create(sizeof(struct msg), 8,
-					    __mqtt_test_destroy_message);
+					    __mqtt_destroy_message);
 		if (!vhd->ring)
 			return -1;
 		break;
@@ -336,7 +382,7 @@ static int callback_mqtt_test(struct lws *wsi, enum lws_callback_reasons reason,
 	case LWS_CALLBACK_CLOSED:
 		lwsl_user("LWS_CALLBACK_CLOSED: wsi %p\n", wsi);
 		/* remove our closing pss from the list of live pss */
-		lws_ll_fwd_remove(struct per_session_data__mqtt_test, pss_list,
+		lws_ll_fwd_remove(struct per_session_data__mqtt, pss_list,
 				  pss, vhd->pss_list);
 		break;
 
@@ -357,7 +403,7 @@ static int callback_mqtt_test(struct lws *wsi, enum lws_callback_reasons reason,
 
 		lws_ring_consume_and_update_oldest_tail(
 			vhd->ring,	/* lws_ring object */
-			struct per_session_data__mqtt_test, /* type of objects with tails */
+			struct per_session_data__mqtt, /* type of objects with tails */
 			&pss->tail,	/* tail of guy doing the consuming */
 			1,		/* number of payload objects being consumed */
 			vhd->pss_list,	/* head of list of objects with tails */
@@ -388,11 +434,11 @@ static int callback_mqtt_test(struct lws *wsi, enum lws_callback_reasons reason,
 
 		if (rsp_msg.len != 0) {
 			if (!lws_ring_insert(vhd->ring, &rsp_msg, 1)) {
-				__mqtt_test_destroy_message(&rsp_msg);
+				__mqtt_destroy_message(&rsp_msg);
 				lwsl_user("dropping!\n");
 				break;
 			}
-			lws_start_foreach_llp(struct per_session_data__mqtt_test **,
+			lws_start_foreach_llp(struct per_session_data__mqtt **,
 				      ppss, vhd->pss_list) {
 				lws_callback_on_writable((*ppss)->wsi);
 			} lws_end_foreach_llp(ppss, pss_list);
@@ -407,11 +453,11 @@ static int callback_mqtt_test(struct lws *wsi, enum lws_callback_reasons reason,
 	return 0;
 }
 
-#define LWS_PLUGIN_PROTOCOL_MQTT_TEST \
+#define LWS_PLUGIN_PROTOCOL_MQTT \
 	{ \
-		"lws-mqtt-test", \
-		callback_mqtt_test, \
-		sizeof(struct per_session_data__mqtt_test), \
+		"lws-mqtt", \
+		callback_mqtt, \
+		sizeof(struct per_session_data__mqtt), \
 		0, \
 		0, NULL, 0 \
 	}

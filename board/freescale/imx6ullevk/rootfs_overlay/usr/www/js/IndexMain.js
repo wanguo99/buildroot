@@ -38,7 +38,7 @@ async function initializeWebSocket() {
 
     try {
         if (!wsManager) {
-            wsManager = new WebSocketClient('ws://10.10.0.221:8080', 'lws-mqtt-test');
+            wsManager = new WebSocketClient('ws://10.10.0.221:8080', 'lws-mqtt');
 
             // Setup message handling after successfully connecting
             wsManager.onMessage = async (message) => {

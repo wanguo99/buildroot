@@ -3,13 +3,13 @@
 #include <signal.h>
 
 #define LWS_PLUGIN_STATIC
-#include "protocol_lws_mqtt_test.c"
+#include "protocol_lws_mqtt.c"
 
 #define LWS_SERVER_PORT 8080
 
 static struct lws_protocols protocols[] = {
 	{ "http", lws_callback_http_dummy, 0, 0, 0, NULL, 0 },
-	LWS_PLUGIN_PROTOCOL_MQTT_TEST,
+	LWS_PLUGIN_PROTOCOL_MQTT,
 	LWS_PROTOCOL_LIST_TERM
 };
 

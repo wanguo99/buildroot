@@ -4,11 +4,11 @@
 #include <libwebsockets.h>
 #endif
 
+#include <sys/stat.h>
 #include <string.h>
 #include <cjson/cJSON.h>
 
 #define MQTT_CONFIGURATION_FILE "/etc/websocket/mqtt_conf.json"
-
 
 #define LWS_MSG_TYPE_SIMPLE_TEXT 		"LWS_MSG_TYPE_SIMPLE_TEXT"
 #define LWS_MSG_TYPE_MQTT_GET_CONFIG 	"LWS_MSG_TYPE_MQTT_GET_CONFIG"
@@ -92,140 +92,187 @@ static void __mqtt_test_destroy_message(void *_msg)
 	}
 }
 
-static int lws_msg_handler_simple_text(cJSON *data)
+static int __mqtt_test_create_msg(const char *content, size_t content_len, struct msg *new_msg)
 {
-    cJSON *message = cJSON_GetObjectItem(data, "message");
+	lwsl_user("content = %s\n", content);
+	lwsl_user("content_len = %d\n", content_len);
+	lwsl_user("new_msg = %p\n", new_msg);
 
-    if (cJSON_IsString(message)) {
-        printf("SIMPLE_TEXT: message=%s\n", message->valuestring);
-    } else {
-        fprintf(stderr, "Error: Invalid SIMPLE_TEXT data\n");
-    }
+	if (!new_msg || !content || content_len == 0) {
+		lwsl_user("Error: Invalid parameters for rsp_msg initialization\n");
+		return -1;
+	}
 
-    return 0;
+	memset(&new_msg, 0, sizeof(new_msg));
+	new_msg->len = content_len;
+	lwsl_user("new_msg->len = %d\n", new_msg->len);
+
+	new_msg->payload = malloc(LWS_PRE + content_len);
+	if (!new_msg->payload) {
+		lwsl_user("OOM: dropping\n");
+		return -1;
+	}
+	lwsl_user("new_msg->payload = %p\n", new_msg->payload);
+
+	memset((char *)new_msg->payload + LWS_PRE, 0, content_len);
+	memcpy((char *)new_msg->payload + LWS_PRE, content, content_len);
+	lwsl_user("new_msg->payload = %s\n", (char *)new_msg->payload + LWS_PRE);
+
+	return 0;
 }
 
-static int lws_msg_handler_mqtt_get_config(cJSON *data, struct msg *rsp_msg)
+static int lws_msg_handler_mqtt_get_config(struct msg *rsp_msg)
 {
+	struct stat file_stat;
 	FILE *file;
+	char *data;
 	long length;
-	char *file_data;
-	size_t read_length;
-	int ret = 0;
+	int status = 0;
+
+	if (stat(MQTT_CONFIGURATION_FILE, &file_stat) != 0) {
+		lwsl_user("Error getting file stats: %s\n", MQTT_CONFIGURATION_FILE);
+		return -1;
+	}
 
 	file = fopen(MQTT_CONFIGURATION_FILE, "r");
 	if (!file) {
-		fprintf(stderr, "Error opening file: %s\n", MQTT_CONFIGURATION_FILE);
-		ret = 1;
-		goto cleanup;
+		lwsl_user("Error opening file: %s\n", MQTT_CONFIGURATION_FILE);
+		return -1;
 	}
 
-	fseek(file, 0, SEEK_END);
-	length = ftell(file);
-	fseek(file, 0, SEEK_SET);
-
-	file_data = (char *)malloc(length + 1);
-	if (!file_data) {
-		fprintf(stderr, "Memory allocation error\n");
-		ret = 1;
+	length = file_stat.st_size;
+	data = (char *)malloc(length + 1);
+	if (!data) {
+		lwsl_user("Memory allocation error\n");
+		status = 1;
 		goto cleanup_file;
 	}
 
-	read_length = fread(file_data, 1, length, file);
-	file_data[read_length] = '\0';
 
-	if (read_length != length) {
-		fprintf(stderr, "Error reading file: %s\n", MQTT_CONFIGURATION_FILE);
-		ret = 1;
+	if (length != fread(data, 1, length, file)) {
+		lwsl_user("Error reading file: %s\n", MQTT_CONFIGURATION_FILE);
+		status = 1;
 		goto cleanup_data;
 	}
 
-	printf("\n-----------------------------\n");
-	printf("Read File JSON Data: \n");
-	printf("-----------------------------\n");
-	printf("%s\n", file_data);
+	data[length] = '\0';
+	lwsl_user("\n-----------------------------\n");
+	lwsl_user("Read File JSON Data: \n");
+	lwsl_user("-----------------------------\n");
+	lwsl_user("%s\n", data);
 
-	rsp_msg->payload = malloc(LWS_PRE + read_length);
-	if (!rsp_msg->payload) {
-		lwsl_user("OOM: dropping\n");
-		ret = 1;
+	status = __mqtt_test_create_msg(data, length, rsp_msg);
+	if (status) {
+		lwsl_user("Error creating response message\n");
 		goto cleanup_data;
 	}
-
-	memcpy((char *)rsp_msg->payload + LWS_PRE, file_data, read_length);
-	rsp_msg->len = read_length;
 
 cleanup_data:
-	free(file_data);
+	free(data);
 cleanup_file:
 	fclose(file);
-cleanup:
-	return ret;
+	return status;
 }
 
-static int lws_msg_handler_mqtt_publish_event(cJSON *data)
+static int lws_msg_handler_mqtt_publish_event(cJSON *data, struct msg *rsp_msg)
 {
+	const char *reply = "{\"status\":\"ok\"}";
+
     cJSON *topic = cJSON_GetObjectItem(data, "topic");
     cJSON *index = cJSON_GetObjectItem(data, "index");
     cJSON *state = cJSON_GetObjectItem(data, "state");
 
     if (cJSON_IsString(topic) && cJSON_IsNumber(index) && cJSON_IsString(state)) {
-        printf("MQTT_PUBLISH_EVENT: topic=%s, index=%d, state=%s\n",
+        lwsl_user("MQTT_PUBLISH_EVENT: topic=%s, index=%d, state=%s\n",
                 topic->valuestring, index->valueint, state->valuestring);
     } else {
-        fprintf(stderr, "Error: Invalid MQTT_PUBLISH_EVENT data\n");
+        lwsl_user("Error: Invalid MQTT_PUBLISH_EVENT data\n");
     }
+
+	if (__mqtt_test_create_msg(reply, strlen(reply), rsp_msg)) {
+		lwsl_user("Error creating response message\n");
+		return -1;
+	}
+
     return 0;
 }
 
-static int ws_callback_receive_parse(struct msg *amsg, struct msg *rsp_msg)
+
+static int lws_msg_handler_simple_text(cJSON *data, struct msg *rsp_msg)
+{
+    cJSON *message = cJSON_GetObjectItem(data, "message");
+
+
+    if (cJSON_IsString(message)) {
+        lwsl_user("SIMPLE_TEXT MSG: %s\n", message->valuestring);
+    } else {
+        lwsl_user("Error: Invalid SIMPLE_TEXT data\n");
+    }
+
+	if (__mqtt_test_create_msg(message->valuestring, strlen(message->valuestring), rsp_msg)) {
+		lwsl_user("Error creating response message\n");
+		return -1;
+	}
+
+    return 0;
+}
+
+static int ws_callback_receive_parse(void *recv_data, size_t len, struct msg *rsp_msg)
 {
 	cJSON *cJsonRoot;
 	cJSON *cJsonType;
-	char *cJsonString;
 	cJSON *cJsonData;
+	char *cJsonString;
 	int status;
 
-	cJsonRoot = cJSON_Parse((const char *)amsg->payload + LWS_PRE);
+	if (!recv_data || !len || !rsp_msg) {
+		lwsl_user("Error: Invalid argument\n");
+		return -1;
+	}
+
+	cJsonRoot = cJSON_Parse(recv_data);
 	if (!cJsonRoot) {
-		fprintf(stderr, "Error parsing JSON\n");
-		return 1;
+		lwsl_user("Error parsing JSON\n");
+		return -1;
 	}
 
 	cJsonType = cJSON_GetObjectItem(cJsonRoot, "type");
 	if (!cJSON_IsString(cJsonType)) {
-		fprintf(stderr, "Error: type is not a string\n");
+		lwsl_user("Error: type is not a string\n");
 		cJSON_Delete(cJsonRoot);
-		return 1;
+		return -1;
 	}
 
 	cJsonData = cJSON_GetObjectItem(cJsonRoot, "data");
 	if (!cJSON_IsObject(cJsonData)) {
-		fprintf(stderr, "Error: Invalid data\n");
+		lwsl_user("Error: Invalid data\n");
 		cJSON_Delete(cJsonRoot);
-		return 1;
+		return -1;
 	}
 
 	cJsonString = cJSON_Print(cJsonRoot);
 	if (cJsonString) {
-		printf("\n-----------------------------\n");
-		printf("Received JSON Data: \n");
-		printf("-----------------------------\n");
-		printf("%s\n", cJsonString);
-		printf("-----------------------------\n");
+		lwsl_user("\n-----------------------------\n");
+		lwsl_user("Received JSON Data: \n");
+		lwsl_user("-----------------------------\n");
+		lwsl_user("%s\n", cJsonString);
+		lwsl_user("-----------------------------\n");
 		free(cJsonString);
 	}
 
 	if (strcmp(cJsonType->valuestring, LWS_MSG_TYPE_SIMPLE_TEXT) == 0) {
-		status = lws_msg_handler_simple_text(cJsonData);
+		status = lws_msg_handler_simple_text(cJsonData, rsp_msg);
 	} else if (strcmp(cJsonType->valuestring, LWS_MSG_TYPE_MQTT_GET_CONFIG) == 0) {
-		status = lws_msg_handler_mqtt_get_config(cJsonData, rsp_msg);
+		status = lws_msg_handler_mqtt_get_config(rsp_msg);
 	} else if (strcmp(cJsonType->valuestring, LWS_MSG_TYPE_MQTT_PUBLISH_EVENT) == 0) {
-		status = lws_msg_handler_mqtt_publish_event(cJsonData);
+		status = lws_msg_handler_mqtt_publish_event(cJsonData, rsp_msg);
 	} else {
-		fprintf(stderr, "Error: Unknown type %s\n", cJsonType->valuestring);
+		lwsl_user("Error: Unknown type %s\n", cJsonType->valuestring);
 		status = 1;
 	}
+
+	lwsl_user("rsp_msg.len = %d\n", rsp_msg->len);
+	lwsl_user("rsp_msg.payload = %d\n", rsp_msg->payload);
 
 	cJSON_Delete(cJsonRoot);
 	return status;
@@ -258,7 +305,7 @@ static int callback_mqtt_test(struct lws *wsi, enum lws_callback_reasons reason,
 		vhd->ring = lws_ring_create(sizeof(struct msg), 8,
 					    __mqtt_test_destroy_message);
 		if (!vhd->ring)
-			return 1;
+			return -1;
 		break;
 
 	case LWS_CALLBACK_PROTOCOL_DESTROY:
@@ -319,22 +366,11 @@ static int callback_mqtt_test(struct lws *wsi, enum lws_callback_reasons reason,
 		if (!n)
 			break;
 
-		amsg.len = len;
-		amsg.payload = malloc(LWS_PRE + len);
-		if (!amsg.payload) {
-			lwsl_user("OOM: dropping\n");
-			break;
-		}
-
-		memcpy((char *)amsg.payload + LWS_PRE, in, len);
-		memset(&rsp_msg, 0, sizeof(rsp_msg));
-		status = ws_callback_receive_parse(&amsg, &rsp_msg);
+		status = ws_callback_receive_parse(in, len, &rsp_msg);
 		if (status < 0) {
 			lwsl_user("Error parsing received message\n");
-			__mqtt_test_destroy_message(&rsp_msg);
 			break;
 		}
-		__mqtt_test_destroy_message(&rsp_msg);
 
 		lwsl_user("rsp_msg.len = %d\n", rsp_msg.len);
 		if (rsp_msg.len != 0) {
